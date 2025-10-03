@@ -1,44 +1,54 @@
 import { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 
 export default function Login({ onLogin }) {
-  const [email, setEmail] = useState('')
+  const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const navigate = useNavigate()
 
   function handleSubmit(e) {
     e.preventDefault()
     setError('')
 
-    if (!email.trim() || !password) {
-      setError('Please enter email and password.')
+    if (!username.trim() || !password) {
+      setError('Please enter username and password.')
       return
     }
 
-    // Very small demo authentication: accept any email/password for now.
-    // In a real app you'd call your API here.
-    const user = { email }
-    try {
-      localStorage.setItem('user', JSON.stringify(user))
-    } catch (e) {
-      // ignore storage errors in demo
-    }
-
-    onLogin(user)
+    fetch('http://127.0.0.1:8000/api/accounts/login/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password }),
+    })
+      .then(async (res) => {
+        const data = await res.json()
+        if (!res.ok) {
+          setError(data && (data.detail || data.non_field_errors || data))
+          return
+        }
+        const auth = { token: data.token, username: data.username, email: data.email }
+        try { localStorage.setItem('auth', JSON.stringify(auth)) } catch (e) {}
+        onLogin({ username: auth.username, email: auth.email, token: auth.token })
+        navigate('/')
+      })
+      .catch((err) => setError('Network error: ' + err.message))
   }
 
   return (
     <div className="login-wrap">
-      <form className="login-form" onSubmit={handleSubmit}>
+      <form className="login-form" onSubmit={handleSubmit} noValidate>
         <h2>Log in</h2>
         {error && <div className="login-error">{error}</div>}
+
         <label>
-          Email
+          Username
           <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="you@example.com"
-            required
+            type="text"
+            autoComplete="username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            placeholder="Enter your username"
           />
         </label>
 
@@ -46,14 +56,26 @@ export default function Login({ onLogin }) {
           Password
           <input
             type="password"
+            autoComplete="current-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="password"
-            required
+            placeholder="Enter your password"
           />
         </label>
 
         <button type="submit" className="btn-primary">Sign in</button>
+
+        <div className="login-footer">
+          <div className="forgot-password">
+            <Link to="/password-reset" className="forgot-link">
+              Forgot your password?
+            </Link>
+          </div>
+          <p>Don't have an account?</p>
+          <Link to="/register">
+            <button type="button" className="btn-secondary">Register</button>
+          </Link>
+        </div>
       </form>
     </div>
   )

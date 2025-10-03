@@ -1,20 +1,23 @@
 import { useEffect, useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import './App.css'
 import Login from './Login'
+import Register from './registration'
+import MainPage from './mainpage'
+import PasswordReset from './PasswordReset'
+import PasswordResetConfirm from './PasswordResetConfirm'
 
 function App() {
   const [user, setUser] = useState(null)
-  const [count, setCount] = useState(0)
 
   useEffect(() => {
     try {
-      const raw = localStorage.getItem('user')
-      if (raw) setUser(JSON.parse(raw))
-    } catch (e) {
-      // ignore
-    }
+      const raw = localStorage.getItem('auth')
+      if (raw) {
+        const a = JSON.parse(raw)
+        setUser({ username: a.username, email: a.email, token: a.token })
+      }
+    } catch (e) {}
   }, [])
 
   function handleLogin(u) {
@@ -23,43 +26,38 @@ function App() {
 
   function handleLogout() {
     try {
-      localStorage.removeItem('user')
+      const raw = localStorage.getItem('auth')
+      const a = raw ? JSON.parse(raw) : null
+      if (a && a.token) {
+        fetch('http://127.0.0.1:8000/api/accounts/logout/', {
+          method: 'POST',
+          headers: { 'Authorization': `Token ${a.token}` },
+        }).catch(() => {})
+      }
+      localStorage.removeItem('auth')
     } catch (e) {}
     setUser(null)
   }
 
-  if (!user) {
-    return <Login onLogin={handleLogin} />
-  }
-
   return (
-    <>
-      <div className="app-header">
-        <div>
-          <a href="https://vite.dev" target="_blank">
-            <img src={viteLogo} className="logo" alt="Vite logo" />
-          </a>
-          <a href="https://react.dev" target="_blank">
-            <img src={reactLogo} className="logo react" alt="React logo" />
-          </a>
-        </div>
-        <div className="user-area">
-          <span className="user-email">{user.email}</span>
-          <button onClick={handleLogout} className="btn-ghost">Log out</button>
-        </div>
-      </div>
-
-      <h1>Vite + React (logged in)</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">Click on the Vite and React logos to learn more</p>
-    </>
+    <BrowserRouter>
+      <Routes>
+        <Route
+          path="/"
+          element={
+            user ? (
+              <MainPage user={user} onLogout={handleLogout} />
+            ) : (
+              <Navigate to="/login" />
+            )
+          }
+        />
+        <Route path="/login" element={<Login onLogin={handleLogin} />} />
+        <Route path="/register" element={<Register onRegister={handleLogin} />} />
+        <Route path="/password-reset" element={<PasswordReset />} />
+        <Route path="/password-reset-confirm" element={<PasswordResetConfirm />} />
+      </Routes>
+    </BrowserRouter>
   )
 }
 
