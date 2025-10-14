@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Job
+from .models import Job, JobApplication
 
 
 class JobSerializer(serializers.ModelSerializer):
@@ -32,4 +32,33 @@ class JobCreateSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         # Set the posted_by field to the current user
         validated_data['posted_by'] = self.context['request'].user
+        return super().create(validated_data)
+
+
+class JobApplicationSerializer(serializers.ModelSerializer):
+    applicant_username = serializers.CharField(source='applicant.username', read_only=True)
+    applicant_email = serializers.CharField(source='applicant.email', read_only=True)
+    job_title = serializers.CharField(source='job.title', read_only=True)
+    job_company = serializers.CharField(source='job.company', read_only=True)
+    
+    class Meta:
+        model = JobApplication
+        fields = [
+            'id', 'job', 'applicant', 'applicant_username', 'applicant_email',
+            'job_title', 'job_company', 'status', 'applied_at', 'message'
+        ]
+        read_only_fields = ['applicant', 'applied_at']
+    
+    def create(self, validated_data):
+        validated_data['applicant'] = self.context['request'].user
+        return super().create(validated_data)
+
+
+class JobApplicationCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = JobApplication
+        fields = ['job', 'message']
+    
+    def create(self, validated_data):
+        validated_data['applicant'] = self.context['request'].user
         return super().create(validated_data)

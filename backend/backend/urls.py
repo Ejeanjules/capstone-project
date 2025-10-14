@@ -20,9 +20,13 @@ from django.http import JsonResponse
 
 def api_root(request):
     return JsonResponse({
-        'message': 'Backend API is running',
+        'message': 'JobBoard Pro API is running',
+        'version': '1.0',
         'endpoints': {
+            'admin': '/admin/',
+            'api_info': '/api/',
             'accounts': '/api/accounts/',
+            'jobs': '/api/jobs/',
             'login': '/api/accounts/login/ (POST)',
             'register': '/api/accounts/register/ (POST)',
             'logout': '/api/accounts/logout/ (POST)',
@@ -32,7 +36,22 @@ def api_root(request):
         }
     })
 
+def home_view(request):
+    return JsonResponse({
+        'message': 'Welcome to JobBoard Pro Backend API',
+        'status': 'running',
+        'frontend_url': 'http://localhost:5173/',
+        'admin_url': 'http://127.0.0.1:8000/admin/',
+        'api_endpoints': {
+            'jobs': '/api/jobs/',
+            'accounts': '/api/accounts/',
+            'documentation': '/api/'
+        },
+        'note': 'This is the backend API. Visit http://localhost:5173/ for the main application.'
+    })
+
 urlpatterns = [
+    path('', home_view, name='home'),  # Root URL
     path('admin/', admin.site.urls),
     path('api/', api_root, name='api_root'),
     path('api/accounts/', include('accounts.urls')),

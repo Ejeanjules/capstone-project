@@ -6,6 +6,7 @@ import Register from './registration'
 import MainPage from './mainpage'
 import PasswordReset from './PasswordReset'
 import PasswordResetConfirm from './PasswordResetConfirm'
+import ProfileGrid from './ProfileGrid.jsx'
 
 function App() {
   const [user, setUser] = useState(null)
@@ -56,6 +57,16 @@ function App() {
         <Route path="/register" element={<Register onRegister={handleLogin} />} />
         <Route path="/password-reset" element={<PasswordReset />} />
         <Route path="/password-reset-confirm" element={<PasswordResetConfirm />} />
+        <Route 
+          path="/profiles" 
+          element={
+            user ? (
+              <ProfileGrid user={user} onLogout={handleLogout} />
+            ) : (
+              <Navigate to="/login" />
+            )
+          } 
+        />
       </Routes>
     </BrowserRouter>
   )

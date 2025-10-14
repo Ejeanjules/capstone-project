@@ -1,8 +1,11 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 export default function MainPage({ user, onLogout }) {
+  const navigate = useNavigate()
   const [jobs, setJobs] = useState([])
   const [showPostForm, setShowPostForm] = useState(false)
+  const [editingJob, setEditingJob] = useState(null)
   const [newJob, setNewJob] = useState({
     title: '',
     company: '',
@@ -50,6 +53,11 @@ export default function MainPage({ user, onLogout }) {
   const handleSubmitJob = async (e) => {
     e.preventDefault()
     
+    // If editing, use the update function instead
+    if (editingJob) {
+      return handleUpdateJob(e)
+    }
+    
     try {
       const auth = JSON.parse(localStorage.getItem('auth'))
       const response = await fetch('http://127.0.0.1:8000/api/jobs/', {
@@ -83,19 +91,170 @@ export default function MainPage({ user, onLogout }) {
           requirements: ''
         })
         setShowPostForm(false)
+        alert('Job posted successfully!')
       } else {
         const errorData = await response.json()
         console.error('Failed to post job:', errorData)
+        alert('Failed to post job')
       }
     } catch (error) {
       console.error('Error posting job:', error)
+      alert('Error posting job')
     }
+  }
+
+  const handleApplyToJob = async (jobId) => {
+    const message = prompt('Optional: Add a message with your application:')
+    
+    try {
+      const auth = JSON.parse(localStorage.getItem('auth'))
+      const response = await fetch(`http://127.0.0.1:8000/api/jobs/${jobId}/apply/`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Token ${auth.token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: message || ''
+        }),
+      })
+
+      if (response.ok) {
+        alert('Application submitted successfully!')
+      } else {
+        const errorData = await response.json()
+        alert(`Error: ${errorData.error || 'Failed to submit application'}`)
+      }
+    } catch (error) {
+      console.error('Error applying to job:', error)
+      alert('Error submitting application')
+    }
+  }
+
+  const handleEditJob = (job) => {
+    setEditingJob(job)
+    setNewJob({
+      title: job.title,
+      company: job.company,
+      location: job.location,
+      type: job.job_type,
+      salary: job.salary || '',
+      description: job.description,
+      requirements: job.requirements || ''
+    })
+    setShowPostForm(true)
+  }
+
+  const handleUpdateJob = async (e) => {
+    e.preventDefault()
+    
+    try {
+      const auth = JSON.parse(localStorage.getItem('auth'))
+      const response = await fetch(`http://127.0.0.1:8000/api/jobs/${editingJob.id}/`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Token ${auth.token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          title: newJob.title,
+          company: newJob.company,
+          location: newJob.location,
+          job_type: newJob.type,
+          salary: newJob.salary,
+          description: newJob.description,
+          requirements: newJob.requirements,
+        }),
+      })
+
+      if (response.ok) {
+        // Refresh the jobs list
+        fetchJobs()
+        // Reset form
+        setNewJob({
+          title: '',
+          company: '',
+          location: '',
+          type: 'full-time',
+          salary: '',
+          description: '',
+          requirements: ''
+        })
+        setShowPostForm(false)
+        setEditingJob(null)
+        alert('Job updated successfully!')
+      } else {
+        const errorData = await response.json()
+        console.error('Failed to update job:', errorData)
+        alert('Failed to update job')
+      }
+    } catch (error) {
+      console.error('Error updating job:', error)
+      alert('Error updating job')
+    }
+  }
+
+  const handleDeleteJob = async (jobId) => {
+    if (!confirm('Are you sure you want to delete this job posting?')) {
+      return
+    }
+    
+    try {
+      const auth = JSON.parse(localStorage.getItem('auth'))
+      const response = await fetch(`http://127.0.0.1:8000/api/jobs/${jobId}/`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Token ${auth.token}`,
+          'Content-Type': 'application/json',
+        },
+      })
+
+      if (response.ok) {
+        fetchJobs() // Refresh the jobs list
+        alert('Job deleted successfully!')
+      } else {
+        const errorData = await response.json()
+        console.error('Failed to delete job:', errorData)
+        alert('Failed to delete job')
+      }
+    } catch (error) {
+      console.error('Error deleting job:', error)
+      alert('Error deleting job')
+    }
+  }
+
+  const handleCancelEdit = () => {
+    setEditingJob(null)
+    setShowPostForm(false)
+    setNewJob({
+      title: '',
+      company: '',
+      location: '',
+      type: 'full-time',
+      salary: '',
+      description: '',
+      requirements: ''
+    })
   }
 
   return (
     <div className="main-page">
       <header className="app-header">
-        <h1>JobBoard Pro</h1>
+        <h1>Genie JobBoard</h1>
+        <nav className="main-nav">
+          <button 
+            className="nav-btn active" 
+            onClick={() => navigate('/')}
+          >
+            Jobs
+          </button>
+          <button 
+            className="nav-btn" 
+            onClick={() => navigate('/profiles')}
+          >
+            your applicants
+          </button>
+        </nav>
         <div className="user-area">
           <span className="user-info">Welcome, {user.username}</span>
           <button onClick={onLogout} className="btn-logout">Log out</button>
@@ -119,7 +278,7 @@ export default function MainPage({ user, onLogout }) {
         {showPostForm && (
           <div className="job-post-form-container">
             <div className="card">
-              <h3>Post a New Job</h3>
+              <h3>{editingJob ? 'Edit Job' : 'Post a New Job'}</h3>
               <form onSubmit={handleSubmitJob} className="job-post-form">
                 <div className="form-row">
                   <div className="form-group">
@@ -209,11 +368,13 @@ export default function MainPage({ user, onLogout }) {
                 </div>
 
                 <div className="form-actions">
-                  <button type="submit" className="btn-primary">Post Job</button>
+                  <button type="submit" className="btn-primary">
+                    {editingJob ? 'Update Job' : 'Post Job'}
+                  </button>
                   <button 
                     type="button" 
                     className="btn-secondary"
-                    onClick={() => setShowPostForm(false)}
+                    onClick={editingJob ? handleCancelEdit : () => setShowPostForm(false)}
                   >
                     Cancel
                   </button>
@@ -259,8 +420,34 @@ export default function MainPage({ user, onLogout }) {
                   <div className="job-footer">
                     <span className="posted-by">Posted by: {job.posted_by_username}</span>
                     <div className="job-actions">
-                      <button className="btn-apply">Apply Now</button>
-                      <button className="btn-save">Save</button>
+                      {job.posted_by_username === user.username ? (
+                        // Show Edit/Delete buttons for own jobs
+                        <>
+                          <button 
+                            className="btn-edit"
+                            onClick={() => handleEditJob(job)}
+                          >
+                            Edit
+                          </button>
+                          <button 
+                            className="btn-delete"
+                            onClick={() => handleDeleteJob(job.id)}
+                          >
+                            Delete
+                          </button>
+                        </>
+                      ) : (
+                        // Show Apply/Save buttons for other jobs
+                        <>
+                          <button 
+                            className="btn-apply"
+                            onClick={() => handleApplyToJob(job.id)}
+                          >
+                            Apply Now
+                          </button>
+                          <button className="btn-save">Save</button>
+                        </>
+                      )}
                     </div>
                   </div>
                 </div>

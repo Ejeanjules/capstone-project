@@ -23,6 +23,34 @@
   color: white;
 }
 
+.main-nav {
+  display: flex;
+  gap: 12px;
+}
+
+.nav-btn {
+  padding: 8px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 6px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.nav-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.nav-btn.active {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
 .user-area {
   display: flex;
   gap: 1rem;
@@ -652,6 +680,36 @@
 .btn-save:hover {
   background: #f5f5f5;
   border-color: #999;
+}
+
+.btn-edit {
+  background: #FF9800;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.btn-edit:hover {
+  background: #F57C00;
+}
+
+.btn-delete {
+  background: #f44336;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.btn-delete:hover {
+  background: #d32f2f;
 }
 
 .no-jobs {

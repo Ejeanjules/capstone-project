@@ -53,3 +53,24 @@ class Job(models.Model):
         else:
             months = diff.days // 30
             return f"{months} months ago" if months > 1 else "1 month ago"
+
+
+class JobApplication(models.Model):
+    STATUSES = [
+        ('pending', 'Pending'),
+        ('accepted', 'Accepted'),
+        ('rejected', 'Rejected'),
+    ]
+    
+    job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name='applications')
+    applicant = models.ForeignKey(User, on_delete=models.CASCADE, related_name='job_applications')
+    status = models.CharField(max_length=20, choices=STATUSES, default='pending')
+    applied_at = models.DateTimeField(auto_now_add=True)
+    message = models.TextField(blank=True, null=True, help_text="Optional message from applicant")
+    
+    class Meta:
+        unique_together = ['job', 'applicant']  # Prevent duplicate applications
+        ordering = ['-applied_at']
+    
+    def __str__(self):
+        return f"{self.applicant.username} applied to {self.job.title}"
