@@ -95,6 +95,14 @@ def apply_to_job(request, job_id):
     if JobApplication.objects.filter(job=job, applicant=request.user).exists():
         return Response({'error': 'You have already applied to this job'}, status=status.HTTP_400_BAD_REQUEST)
     
+    # Check if job is still accepting applications (enforce max_applicants limit)
+    if not job.is_accepting_applications:
+        return Response({
+            'error': 'This job has reached its maximum number of applicants',
+            'max_applicants': job.max_applicants,
+            'current_applications': job.application_count
+        }, status=status.HTTP_400_BAD_REQUEST)
+    
     # Create application
     data = request.data.copy()
     data['job'] = job_id

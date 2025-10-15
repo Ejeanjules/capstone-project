@@ -104,10 +104,26 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",  # Vite dev server
     "http://localhost:5174",  # Alternative Vite port
+    "http://localhost:5175",  # Alternative Vite port
+    "http://localhost:5176",  # Alternative Vite port
 ]
-# Also allow plain localhost (no port) in case frontend is served differently
-if "http://localhost" not in CORS_ALLOWED_ORIGINS:
-    CORS_ALLOWED_ORIGINS.append("http://localhost")
+
+# Additional CORS settings for development
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_ALL_ORIGINS = DEBUG  # Allow all origins in debug mode
+
+# Allow common headers
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
 
 # ✅ Django REST Framework settings
 REST_FRAMEWORK = {

@@ -6,6 +6,8 @@ export default function MainPage({ user, onLogout }) {
   const [jobs, setJobs] = useState([])
   const [showPostForm, setShowPostForm] = useState(false)
   const [editingJob, setEditingJob] = useState(null)
+  const [showApplicationForm, setShowApplicationForm] = useState(false)
+  const [applyingToJob, setApplyingToJob] = useState(null)
   const [newJob, setNewJob] = useState({
     title: '',
     company: '',
@@ -13,7 +15,17 @@ export default function MainPage({ user, onLogout }) {
     type: 'full-time',
     salary: '',
     description: '',
-    requirements: ''
+    requirements: '',
+    maxApplicants: ''
+  })
+  const [applicationData, setApplicationData] = useState({
+    coverLetter: '',
+    experience: '',
+    availability: 'immediate',
+    salaryExpectation: '',
+    portfolio: '',
+    additionalMessage: '',
+    resume: null
   })
 
   // Fetch jobs from backend
@@ -74,6 +86,7 @@ export default function MainPage({ user, onLogout }) {
           salary: newJob.salary,
           description: newJob.description,
           requirements: newJob.requirements,
+          max_applicants: newJob.maxApplicants || null,
         }),
       })
 
@@ -88,7 +101,8 @@ export default function MainPage({ user, onLogout }) {
           type: 'full-time',
           salary: '',
           description: '',
-          requirements: ''
+          requirements: '',
+          maxApplicants: ''
         })
         setShowPostForm(false)
         alert('Job posted successfully!')
@@ -103,32 +117,116 @@ export default function MainPage({ user, onLogout }) {
     }
   }
 
-  const handleApplyToJob = async (jobId) => {
-    const message = prompt('Optional: Add a message with your application:')
+  const handleApplyToJob = (jobId) => {
+    // Find the job to check if it's accepting applications
+    const job = jobs.find(j => j.id === jobId)
+    if (job && !job.is_accepting_applications) {
+      alert(`This position is full! It has reached its maximum of ${job.max_applicants} applicants.`)
+      return
+    }
+
+    // Set the job we're applying to and show the application form
+    setApplyingToJob(job)
+    setShowApplicationForm(true)
+  }
+
+  const handleApplicationInputChange = (e) => {
+    const { name, value } = e.target
+    setApplicationData(prev => ({
+      ...prev,
+      [name]: value
+    }))
+  }
+
+  const handleResumeUpload = (e) => {
+    const file = e.target.files[0]
+    if (file) {
+      // Validate file type and size
+      const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document']
+      const maxSize = 5 * 1024 * 1024 // 5MB
+      
+      if (!allowedTypes.includes(file.type)) {
+        alert('Please upload a PDF or Word document (.pdf, .doc, .docx)')
+        e.target.value = ''
+        return
+      }
+      
+      if (file.size > maxSize) {
+        alert('File size must be less than 5MB')
+        e.target.value = ''
+        return
+      }
+      
+      setApplicationData(prev => ({
+        ...prev,
+        resume: file
+      }))
+    }
+  }
+
+  const handleSubmitApplication = async (e) => {
+    e.preventDefault()
     
     try {
+      let resumeInfo = ''
+      if (applicationData.resume) {
+        resumeInfo = `\n\nResume: ${applicationData.resume.name} (${(applicationData.resume.size / 1024).toFixed(1)}KB)`
+      }
+      
       const auth = JSON.parse(localStorage.getItem('auth'))
-      const response = await fetch(`http://127.0.0.1:8000/api/jobs/${jobId}/apply/`, {
+      const response = await fetch(`http://127.0.0.1:8000/api/jobs/${applyingToJob.id}/apply/`, {
         method: 'POST',
         headers: {
           'Authorization': `Token ${auth.token}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          message: message || ''
+          message: `Cover Letter: ${applicationData.coverLetter}\n\nExperience: ${applicationData.experience}\n\nAvailability: ${applicationData.availability}\n\nSalary Expectation: ${applicationData.salaryExpectation}\n\nPortfolio: ${applicationData.portfolio}\n\nAdditional Message: ${applicationData.additionalMessage}${resumeInfo}`
         }),
       })
 
       if (response.ok) {
         alert('Application submitted successfully!')
+        // Reset form and close
+        setApplicationData({
+          coverLetter: '',
+          experience: '',
+          availability: 'immediate',
+          salaryExpectation: '',
+          portfolio: '',
+          additionalMessage: '',
+          resume: null
+        })
+        setShowApplicationForm(false)
+        setApplyingToJob(null)
+        // Refresh the jobs list to update application counts
+        fetchJobs()
       } else {
         const errorData = await response.json()
-        alert(`Error: ${errorData.error || 'Failed to submit application'}`)
+        if (errorData.max_applicants && errorData.current_applications) {
+          alert(`This position is full! It has ${errorData.current_applications}/${errorData.max_applicants} applicants.`)
+        } else {
+          alert(`Error: ${errorData.error || 'Failed to submit application'}`)
+        }
       }
     } catch (error) {
       console.error('Error applying to job:', error)
       alert('Error submitting application')
     }
+  }
+
+  const handleCancelApplication = () => {
+    setShowApplicationForm(false)
+    setApplyingToJob(null)
+    setApplicationData({
+      coverLetter: '',
+      experience: '',
+      availability: 'immediate',
+      salaryExpectation: '',
+      portfolio: '',
+      additionalMessage: '',
+      resume: null
+    })
   }
 
   const handleEditJob = (job) => {
@@ -140,7 +238,8 @@ export default function MainPage({ user, onLogout }) {
       type: job.job_type,
       salary: job.salary || '',
       description: job.description,
-      requirements: job.requirements || ''
+      requirements: job.requirements || '',
+      maxApplicants: job.max_applicants || ''
     })
     setShowPostForm(true)
   }
@@ -164,6 +263,7 @@ export default function MainPage({ user, onLogout }) {
           salary: newJob.salary,
           description: newJob.description,
           requirements: newJob.requirements,
+          max_applicants: newJob.maxApplicants || null,
         }),
       })
 
@@ -178,7 +278,8 @@ export default function MainPage({ user, onLogout }) {
           type: 'full-time',
           salary: '',
           description: '',
-          requirements: ''
+          requirements: '',
+          maxApplicants: ''
         })
         setShowPostForm(false)
         setEditingJob(null)
@@ -233,7 +334,8 @@ export default function MainPage({ user, onLogout }) {
       type: 'full-time',
       salary: '',
       description: '',
-      requirements: ''
+      requirements: '',
+      maxApplicants: ''
     })
   }
 
@@ -333,15 +435,33 @@ export default function MainPage({ user, onLogout }) {
                   </div>
                 </div>
 
-                <div className="form-group">
-                  <label>Salary Range</label>
-                  <input
-                    type="text"
-                    name="salary"
-                    value={newJob.salary}
-                    onChange={handleInputChange}
-                    placeholder="e.g. $70,000 - $90,000 or $50/hour"
-                  />
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Salary Range</label>
+                    <input
+                      type="text"
+                      name="salary"
+                      value={newJob.salary}
+                      onChange={handleInputChange}
+                      placeholder="e.g. $70,000 - $90,000 or $50/hour"
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Max Applicants</label>
+                    <select
+                      name="maxApplicants"
+                      value={newJob.maxApplicants}
+                      onChange={handleInputChange}
+                    >
+                      <option value="">No limit</option>
+                      <option value="5">5 applicants</option>
+                      <option value="10">10 applicants</option>
+                      <option value="15">15 applicants</option>
+                      <option value="20">20 applicants</option>
+                      <option value="25">25 applicants</option>
+                      <option value="50">50 applicants</option>
+                    </select>
+                  </div>
                 </div>
 
                 <div className="form-group">
@@ -384,6 +504,125 @@ export default function MainPage({ user, onLogout }) {
           </div>
         )}
 
+        {/* Application Form */}
+        {showApplicationForm && applyingToJob && (
+          <div className="form-overlay">
+            <div className="card application-form-card">
+              <h3>Apply to {applyingToJob.title} at {applyingToJob.company}</h3>
+              <form onSubmit={handleSubmitApplication} className="job-post-form">
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Cover Letter *</label>
+                    <textarea
+                      name="coverLetter"
+                      value={applicationData.coverLetter}
+                      onChange={handleApplicationInputChange}
+                      placeholder="Tell us why you're perfect for this role..."
+                      rows="4"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Relevant Experience</label>
+                    <textarea
+                      name="experience"
+                      value={applicationData.experience}
+                      onChange={handleApplicationInputChange}
+                      placeholder="Describe your relevant work experience, projects, or skills..."
+                      rows="3"
+                    />
+                  </div>
+                </div>
+
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Availability *</label>
+                    <select
+                      name="availability"
+                      value={applicationData.availability}
+                      onChange={handleApplicationInputChange}
+                      required
+                    >
+                      <option value="immediate">Available Immediately</option>
+                      <option value="2-weeks">2 weeks notice</option>
+                      <option value="1-month">1 month notice</option>
+                      <option value="negotiable">Negotiable</option>
+                    </select>
+                  </div>
+                  <div className="form-group">
+                    <label>Salary Expectation</label>
+                    <input
+                      type="text"
+                      name="salaryExpectation"
+                      value={applicationData.salaryExpectation}
+                      onChange={handleApplicationInputChange}
+                      placeholder="e.g. $70,000 or Negotiable"
+                    />
+                  </div>
+                </div>
+
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Portfolio/LinkedIn URL</label>
+                    <input
+                      type="url"
+                      name="portfolio"
+                      value={applicationData.portfolio}
+                      onChange={handleApplicationInputChange}
+                      placeholder="https://linkedin.com/in/yourprofile or portfolio link"
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Upload Resume *</label>
+                    <input
+                      type="file"
+                      accept=".pdf,.doc,.docx"
+                      onChange={handleResumeUpload}
+                      className="file-input"
+                      required
+                    />
+                    <small className="file-help">
+                      Upload PDF or Word document (max 5MB)
+                    </small>
+                    {applicationData.resume && (
+                      <div className="file-selected">
+                        ✓ {applicationData.resume.name} ({(applicationData.resume.size / 1024).toFixed(1)}KB)
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label>Additional Message</label>
+                  <textarea
+                    name="additionalMessage"
+                    value={applicationData.additionalMessage}
+                    onChange={handleApplicationInputChange}
+                    placeholder="Any additional information you'd like to share..."
+                    rows="2"
+                  />
+                </div>
+
+                <div className="form-actions">
+                  <button type="submit" className="btn-primary">
+                    Submit Application
+                  </button>
+                  <button 
+                    type="button" 
+                    className="btn-secondary"
+                    onClick={handleCancelApplication}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
         <div className="jobs-list">
           {jobs.length === 0 ? (
             <div className="no-jobs">
@@ -407,6 +646,12 @@ export default function MainPage({ user, onLogout }) {
                   <div className="job-info">
                     <span className="job-location">📍 {job.location}</span>
                     {job.salary && <span className="job-salary">💰 {job.salary}</span>}
+                    <span className="job-applications">
+                      👥 {job.application_status_display}
+                      {!job.is_accepting_applications && (
+                        <span className="job-full-badge">FULL</span>
+                      )}
+                    </span>
                   </div>
                   
                   <p className="job-description">{job.description}</p>
@@ -440,10 +685,12 @@ export default function MainPage({ user, onLogout }) {
                         // Show Apply/Save buttons for other jobs
                         <>
                           <button 
-                            className="btn-apply"
+                            className={`btn-apply ${!job.is_accepting_applications ? 'btn-disabled' : ''}`}
                             onClick={() => handleApplyToJob(job.id)}
+                            disabled={!job.is_accepting_applications}
+                            title={!job.is_accepting_applications ? 'This job has reached its maximum number of applicants' : 'Apply to this job'}
                           >
-                            Apply Now
+                            {job.is_accepting_applications ? 'Apply Now' : 'Position Full'}
                           </button>
                           <button className="btn-save">Save</button>
                         </>

@@ -17,6 +17,7 @@ class Job(models.Model):
     salary = models.CharField(max_length=100, blank=True, null=True)
     description = models.TextField()
     requirements = models.TextField(blank=True, null=True)
+    max_applicants = models.PositiveIntegerField(blank=True, null=True, help_text="Maximum number of applicants allowed")
     posted_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='posted_jobs')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -27,6 +28,25 @@ class Job(models.Model):
     
     def __str__(self):
         return f"{self.title} at {self.company}"
+    
+    @property
+    def application_count(self):
+        """Return the number of applications for this job"""
+        return self.applications.count()
+    
+    @property
+    def is_accepting_applications(self):
+        """Check if job is still accepting applications based on max_applicants limit"""
+        if not self.max_applicants:
+            return True  # No limit set
+        return self.application_count < self.max_applicants
+    
+    @property
+    def application_status_display(self):
+        """Return a formatted string showing current applications vs max"""
+        if not self.max_applicants:
+            return f"{self.application_count} applications"
+        return f"{self.application_count}/{self.max_applicants} applications"
     
     @property
     def posted_at_display(self):

@@ -164,7 +164,7 @@ const ProfileGrid = ({ user, onLogout }) => {
   return (
     <div style={styles.page}>
       <header style={styles.header}>
-        <h1 style={styles.headerTitle}>JobBoard Pro - Find Candidates</h1>
+        <h1 style={styles.headerTitle}>Genie - your currrent canidates</h1>
         <nav style={styles.nav}>
           <button 
             style={styles.navBtn} 
@@ -175,7 +175,7 @@ const ProfileGrid = ({ user, onLogout }) => {
           <button 
             style={{...styles.navBtn, ...styles.navActive}} 
           >
-            Find Candidates
+            begin Matching
           </button>
         </nav>
         <div style={styles.userArea}>
@@ -346,6 +346,14 @@ const styles = {
   applicationHeader: {
     marginBottom: "12px",
   },
+  name: {
+    fontSize: "20px",
+    fontWeight: "700",
+    color: "#0969da",
+    margin: "0 0 8px 0",
+    textTransform: "capitalize",
+    letterSpacing: "0.3px",
+  },
   applicationMeta: {
     display: "flex",
     flexDirection: "column",
@@ -385,6 +393,30 @@ const styles = {
     gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
     gap: "20px",
     padding: "20px",
+  },
+  card: {
+    backgroundColor: "#ffffff",
+    borderRadius: "8px",
+    padding: "20px",
+    border: "1px solid #e1e4e8",
+    boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
+    transition: "box-shadow 0.2s ease-in-out",
+  },
+  actions: {
+    display: "flex",
+    gap: "10px",
+    marginTop: "15px",
+  },
+  button: {
+    flex: 1,
+    padding: "8px 16px",
+    border: "none",
+    borderRadius: "6px",
+    color: "#ffffff",
+    cursor: "pointer",
+    fontWeight: "500",
+    fontSize: "14px",
+    transition: "opacity 0.2s ease-in-out",
   },
 };
 

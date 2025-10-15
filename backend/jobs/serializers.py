@@ -5,13 +5,17 @@ from .models import Job, JobApplication
 class JobSerializer(serializers.ModelSerializer):
     posted_by_username = serializers.CharField(source='posted_by.username', read_only=True)
     posted_at_display = serializers.CharField(read_only=True)
+    application_count = serializers.IntegerField(read_only=True)
+    is_accepting_applications = serializers.BooleanField(read_only=True)
+    application_status_display = serializers.CharField(read_only=True)
     
     class Meta:
         model = Job
         fields = [
             'id', 'title', 'company', 'location', 'job_type', 'salary',
-            'description', 'requirements', 'posted_by', 'posted_by_username',
-            'created_at', 'updated_at', 'is_active', 'posted_at_display'
+            'description', 'requirements', 'max_applicants', 'posted_by', 'posted_by_username',
+            'created_at', 'updated_at', 'is_active', 'posted_at_display',
+            'application_count', 'is_accepting_applications', 'application_status_display'
         ]
         read_only_fields = ['posted_by', 'created_at', 'updated_at']
     
@@ -26,7 +30,7 @@ class JobCreateSerializer(serializers.ModelSerializer):
         model = Job
         fields = [
             'title', 'company', 'location', 'job_type', 'salary',
-            'description', 'requirements'
+            'description', 'requirements', 'max_applicants'
         ]
     
     def create(self, validated_data):
