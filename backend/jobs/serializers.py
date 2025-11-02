@@ -44,14 +44,18 @@ class JobApplicationSerializer(serializers.ModelSerializer):
     applicant_email = serializers.CharField(source='applicant.email', read_only=True)
     job_title = serializers.CharField(source='job.title', read_only=True)
     job_company = serializers.CharField(source='job.company', read_only=True)
+    resume_name = serializers.CharField(read_only=True)
     
     class Meta:
         model = JobApplication
         fields = [
             'id', 'job', 'applicant', 'applicant_username', 'applicant_email',
-            'job_title', 'job_company', 'status', 'applied_at', 'message'
+            'job_title', 'job_company', 'status', 'applied_at', 'message', 
+            'resume', 'resume_name', 'resume_analysis_score', 'resume_analysis_data',
+            'analysis_completed', 'analysis_date'
         ]
-        read_only_fields = ['applicant', 'applied_at']
+        read_only_fields = ['applicant', 'applied_at', 'resume_analysis_score', 
+                           'resume_analysis_data', 'analysis_completed', 'analysis_date']
     
     def create(self, validated_data):
         validated_data['applicant'] = self.context['request'].user
@@ -61,7 +65,24 @@ class JobApplicationSerializer(serializers.ModelSerializer):
 class JobApplicationCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = JobApplication
-        fields = ['job', 'message']
+        fields = ['job', 'message', 'resume']
+    
+    def validate_resume(self, value):
+        """Validate resume file"""
+        if value:
+            # Check file size (5MB limit)
+            if value.size > 5 * 1024 * 1024:  # 5MB
+                raise serializers.ValidationError("Resume file size must be less than 5MB")
+            
+            # Check file extension
+            import os
+            ext = os.path.splitext(value.name)[1].lower()
+            allowed_extensions = ['.pdf', '.doc', '.docx']
+            if ext not in allowed_extensions:
+                raise serializers.ValidationError(
+                    f"Unsupported file type. Allowed types: {', '.join(allowed_extensions)}"
+                )
+        return value
     
     def create(self, validated_data):
         validated_data['applicant'] = self.context['request'].user

@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     # Your apps
     'accounts',
     'jobs',
+    'user_notifications',
 ]
 
 # ✅ Middleware
@@ -93,6 +94,14 @@ USE_TZ = True
 
 # ✅ Static files
 STATIC_URL = 'static/'
+
+# ✅ Media files (for file uploads)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
+# File upload settings
+FILE_UPLOAD_MAX_MEMORY_SIZE = 5242880  # 5MB
+DATA_UPLOAD_MAX_MEMORY_SIZE = 5242880  # 5MB
 
 # ✅ Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

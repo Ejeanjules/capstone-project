@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import TopNavigation from './BottomNavigation'
 
 export default function MainPage({ user, onLogout }) {
   const navigate = useNavigate()
@@ -106,6 +107,8 @@ export default function MainPage({ user, onLogout }) {
         })
         setShowPostForm(false)
         alert('Job posted successfully!')
+        // Redirect to home page
+        navigate('/')
       } else {
         const errorData = await response.json()
         console.error('Failed to post job:', errorData)
@@ -168,24 +171,39 @@ export default function MainPage({ user, onLogout }) {
     e.preventDefault()
     
     try {
-      let resumeInfo = ''
+      const auth = JSON.parse(localStorage.getItem('auth'))
+      
+      // Create FormData for file upload
+      const formData = new FormData()
+      
+      // Prepare the message content
+      const messageContent = [
+        `Cover Letter: ${applicationData.coverLetter}`,
+        `Experience: ${applicationData.experience}`,
+        `Availability: ${applicationData.availability}`,
+        `Salary Expectation: ${applicationData.salaryExpectation}`,
+        `Portfolio: ${applicationData.portfolio}`,
+        `Additional Message: ${applicationData.additionalMessage}`
+      ].filter(item => item.split(': ')[1].trim()).join('\n\n')
+      
+      formData.append('message', messageContent)
+      
+      // Add resume file if uploaded
       if (applicationData.resume) {
-        resumeInfo = `\n\nResume: ${applicationData.resume.name} (${(applicationData.resume.size / 1024).toFixed(1)}KB)`
+        formData.append('resume', applicationData.resume)
       }
       
-      const auth = JSON.parse(localStorage.getItem('auth'))
       const response = await fetch(`http://127.0.0.1:8000/api/jobs/${applyingToJob.id}/apply/`, {
         method: 'POST',
         headers: {
           'Authorization': `Token ${auth.token}`,
-          'Content-Type': 'application/json',
+          // Don't set Content-Type header - let browser set it with boundary for FormData
         },
-        body: JSON.stringify({
-          message: `Cover Letter: ${applicationData.coverLetter}\n\nExperience: ${applicationData.experience}\n\nAvailability: ${applicationData.availability}\n\nSalary Expectation: ${applicationData.salaryExpectation}\n\nPortfolio: ${applicationData.portfolio}\n\nAdditional Message: ${applicationData.additionalMessage}${resumeInfo}`
-        }),
+        body: formData
       })
 
       if (response.ok) {
+        const responseData = await response.json()
         alert('Application submitted successfully!')
         // Reset form and close
         setApplicationData({
@@ -197,6 +215,8 @@ export default function MainPage({ user, onLogout }) {
           additionalMessage: '',
           resume: null
         })
+        // Reset file input
+        document.querySelector('.file-input').value = ''
         setShowApplicationForm(false)
         setApplyingToJob(null)
         // Refresh the jobs list to update application counts
@@ -284,6 +304,8 @@ export default function MainPage({ user, onLogout }) {
         setShowPostForm(false)
         setEditingJob(null)
         alert('Job updated successfully!')
+        // Redirect to home page
+        navigate('/')
       } else {
         const errorData = await response.json()
         console.error('Failed to update job:', errorData)
@@ -340,28 +362,9 @@ export default function MainPage({ user, onLogout }) {
   }
 
   return (
-    <div className="main-page">
-      <header className="app-header">
-        <h1>Genie JobBoard</h1>
-        <nav className="main-nav">
-          <button 
-            className="nav-btn active" 
-            onClick={() => navigate('/')}
-          >
-            Jobs
-          </button>
-          <button 
-            className="nav-btn" 
-            onClick={() => navigate('/profiles')}
-          >
-            your applicants
-          </button>
-        </nav>
-        <div className="user-area">
-          <span className="user-info">Welcome, {user.username}</span>
-          <button onClick={onLogout} className="btn-logout">Log out</button>
-        </div>
-      </header>
+    <div className="main-page page-with-top-nav">
+      {/* Top Navigation */}
+      <TopNavigation user={user} onLogout={onLogout} />
       
       <main className="main-content">
         <div className="job-board-header">
@@ -369,12 +372,20 @@ export default function MainPage({ user, onLogout }) {
             <h2>Job Board</h2>
             <p>{jobs.length} active job postings</p>
           </div>
-          <button 
-            className="btn-post-job" 
-            onClick={() => setShowPostForm(!showPostForm)}
-          >
-            {showPostForm ? 'Cancel' : '+ Post Job'}
-          </button>
+          <div className="header-actions">
+            <button 
+              className="btn-bulk-analysis" 
+              onClick={() => navigate('/bulk-analysis')}
+            >
+              📊 Bulk Resume Analysis
+            </button>
+            <button 
+              className="btn-post-job" 
+              onClick={() => setShowPostForm(!showPostForm)}
+            >
+              {showPostForm ? 'Cancel' : '+ Post Job'}
+            </button>
+          </div>
         </div>
 
         {showPostForm && (
@@ -703,6 +714,7 @@ export default function MainPage({ user, onLogout }) {
           )}
         </div>
       </main>
+      
     </div>
   )
 }

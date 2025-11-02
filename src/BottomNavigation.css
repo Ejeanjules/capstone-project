@@ -1,0 +1,245 @@
+/* Top Navigation Styles */
+.top-navigation {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: #000000;
+  border-bottom: 1px solid #000000;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  padding: 12px 0;
+}
+
+.top-nav-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Genie Logo */
+.top-nav-logo {
+  display: flex;
+  align-items: center;
+}
+
+.genie-logo-img {
+  height: 50px;
+  width: auto;
+  max-width: 120px;
+  object-fit: contain;
+  border-radius: 4px;
+}
+
+/* Legacy text logo (kept for fallback) */
+.genie-logo {
+  font-size: 28px;
+  font-weight: bold;
+  color: #007bff;
+  font-family: 'Arial', sans-serif;
+  text-transform: lowercase;
+  letter-spacing: -0.5px;
+}
+
+/* Navigation Items */
+.top-nav-items {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.top-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-radius: 8px;
+  text-decoration: none;
+}
+
+.top-nav-item:hover {
+  background: #0c60b4;
+  transform: translateY(-1px);
+}
+
+.top-nav-item.active {
+  background: #007bff;
+  color: white;
+}
+
+.top-nav-item.active .nav-icon {
+  transform: scale(1.1);
+}
+
+/* User Section */
+.top-nav-user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.user-info {
+  color: #6c757d;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.logout-btn {
+  padding: 8px 16px;
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.logout-btn:hover {
+  background: #c82333;
+  transform: translateY(-1px);
+}
+
+.nav-icon {
+  font-size: 18px;
+  transition: transform 0.2s ease;
+}
+
+.nav-icon-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.notification-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background-color: #dc3545;
+  color: white;
+  border-radius: 10px;
+  padding: 2px 6px;
+  font-size: 10px;
+  font-weight: bold;
+  min-width: 16px;
+  text-align: center;
+  line-height: 1.2;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.nav-label {
+  font-size: 14px;
+  font-weight: 500;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.top-nav-item.active .nav-label {
+  color: white;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .top-nav-container {
+    padding: 0 15px;
+  }
+  
+  .top-nav-item {
+    padding: 8px 12px;
+  }
+  
+  .nav-icon {
+    font-size: 16px;
+  }
+  
+  .notification-badge {
+    top: -6px;
+    right: -6px;
+    padding: 1px 4px;
+    font-size: 9px;
+    min-width: 14px;
+  }
+  
+  .nav-label {
+    font-size: 12px;
+  }
+  
+  .genie-logo {
+    font-size: 24px;
+  }
+  
+  .genie-logo-img {
+    height: 40px;
+    max-width: 100px;
+  }
+  
+  .top-nav-items {
+    gap: 8px;
+  }
+  
+  .user-info {
+    display: none; /* Hide welcome message on mobile */
+  }
+}
+
+@media (max-width: 480px) {
+  .top-nav-items {
+    gap: 4px;
+  }
+  
+  .top-nav-item {
+    padding: 6px 10px;
+  }
+  
+  .nav-label {
+    display: none; /* Hide labels on very small screens */
+  }
+  
+  .nav-icon {
+    font-size: 18px;
+  }
+  
+  .notification-badge {
+    top: -4px;
+    right: -4px;
+    padding: 1px 3px;
+    font-size: 8px;
+    min-width: 12px;
+  }
+  
+  .genie-logo-img {
+    height: 35px;
+    max-width: 80px;
+  }
+}
+
+/* Add top padding to pages to prevent overlap */
+.page-with-top-nav {
+  padding-top: 80px;
+}
+
+/* Animation for active state */
+@keyframes bounce {
+  0%, 20%, 60%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-2px);
+  }
+  80% {
+    transform: translateY(-1px);
+  }
+}
+
+.top-nav-item.active .nav-icon {
+  animation: bounce 0.6s ease;
+}

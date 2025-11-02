@@ -75,6 +75,16 @@ class Job(models.Model):
             return f"{months} months ago" if months > 1 else "1 month ago"
 
 
+def resume_upload_path(instance, filename):
+    """
+    Generate upload path for resume files
+    Format: resumes/{user_id}/{job_id}_{filename}
+    """
+    import os
+    name, ext = os.path.splitext(filename)
+    return f'resumes/{instance.applicant.id}/{instance.job.id}_{name}{ext}'
+
+
 class JobApplication(models.Model):
     STATUSES = [
         ('pending', 'Pending'),
@@ -87,6 +97,32 @@ class JobApplication(models.Model):
     status = models.CharField(max_length=20, choices=STATUSES, default='pending')
     applied_at = models.DateTimeField(auto_now_add=True)
     message = models.TextField(blank=True, null=True, help_text="Optional message from applicant")
+    resume = models.FileField(
+        upload_to=resume_upload_path,
+        blank=True,
+        null=True,
+        help_text="Upload your resume (PDF, DOC, DOCX supported)"
+    )
+    
+    # Resume analysis fields
+    resume_analysis_score = models.FloatField(
+        default=0.0,
+        help_text="Resume match score (0-100)"
+    )
+    resume_analysis_data = models.JSONField(
+        default=dict,
+        blank=True,
+        help_text="Detailed resume analysis results"
+    )
+    analysis_completed = models.BooleanField(
+        default=False,
+        help_text="Whether resume analysis has been completed"
+    )
+    analysis_date = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="When the resume analysis was last performed"
+    )
     
     class Meta:
         unique_together = ['job', 'applicant']  # Prevent duplicate applications
@@ -94,3 +130,11 @@ class JobApplication(models.Model):
     
     def __str__(self):
         return f"{self.applicant.username} applied to {self.job.title}"
+    
+    @property
+    def resume_name(self):
+        """Return just the filename of the resume"""
+        if self.resume:
+            import os
+            return os.path.basename(self.resume.name)
+        return None

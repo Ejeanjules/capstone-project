@@ -7,6 +7,10 @@ import MainPage from './mainpage'
 import PasswordReset from './PasswordReset'
 import PasswordResetConfirm from './PasswordResetConfirm'
 import ProfileGrid from './ProfileGrid.jsx'
+import ProfilePage from './ProfilePage.jsx'
+import NotificationsPage from './NotificationsPage.jsx'
+import MyApplicationsPage from './MyApplicationsPage.jsx'
+import BulkResumeAnalysisPage from './BulkResumeAnalysisPage.jsx'
 
 function App() {
   const [user, setUser] = useState(null)
@@ -62,6 +66,46 @@ function App() {
           element={
             user ? (
               <ProfileGrid user={user} onLogout={handleLogout} />
+            ) : (
+              <Navigate to="/login" />
+            )
+          } 
+        />
+        <Route 
+          path="/profile" 
+          element={
+            user ? (
+              <ProfilePage user={user} onLogout={handleLogout} />
+            ) : (
+              <Navigate to="/login" />
+            )
+          } 
+        />
+        <Route 
+          path="/notifications" 
+          element={
+            user ? (
+              <NotificationsPage user={user} onLogout={handleLogout} />
+            ) : (
+              <Navigate to="/login" />
+            )
+          } 
+        />
+        <Route 
+          path="/applications" 
+          element={
+            user ? (
+              <MyApplicationsPage user={user} onLogout={handleLogout} />
+            ) : (
+              <Navigate to="/login" />
+            )
+          } 
+        />
+        <Route 
+          path="/bulk-analysis" 
+          element={
+            user ? (
+              <BulkResumeAnalysisPage user={user} onLogout={handleLogout} />
             ) : (
               <Navigate to="/login" />
             )

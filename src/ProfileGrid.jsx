@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
 import ProfileCard from "./ProfileCard.jsx";
+import TopNavigation from './BottomNavigation';
 
 // A pool of sample skills to randomly assign
 const skillPool = [
@@ -162,27 +163,9 @@ const ProfileGrid = ({ user, onLogout }) => {
   }));
 
   return (
-    <div style={styles.page}>
-      <header style={styles.header}>
-        <h1 style={styles.headerTitle}>Genie - your currrent canidates</h1>
-        <nav style={styles.nav}>
-          <button 
-            style={styles.navBtn} 
-            onClick={() => navigate('/')}
-          >
-            Jobs
-          </button>
-          <button 
-            style={{...styles.navBtn, ...styles.navActive}} 
-          >
-            begin Matching
-          </button>
-        </nav>
-        <div style={styles.userArea}>
-          <span style={styles.userInfo}>Welcome, {user?.username}</span>
-          <button style={styles.logoutBtn} onClick={onLogout}>Log out</button>
-        </div>
-      </header>
+    <div style={{...styles.page, paddingTop: '80px'}}>
+      {/* Top Navigation */}
+      <TopNavigation user={user} onLogout={onLogout} />
 
       {/* Job Filter */}
       <div style={styles.filterPanel}>
@@ -311,6 +294,11 @@ const styles = {
     justifyContent: "space-between",
     border: "1px solid #e1e4e8",
   },
+  filterLeft: {
+    display: "flex",
+    alignItems: "center",
+    gap: "15px",
+  },
   filterLabel: {
     display: "flex",
     alignItems: "center",
@@ -323,6 +311,17 @@ const styles = {
     border: "1px solid #d0d7de",
     borderRadius: "6px",
     fontSize: "14px",
+  },
+  analyzeAllButton: {
+    padding: "8px 16px",
+    border: "none",
+    borderRadius: "6px",
+    backgroundColor: "#0969da",
+    color: "#fff",
+    cursor: "pointer",
+    fontSize: "14px",
+    fontWeight: "500",
+    transition: "background-color 0.2s ease-in-out",
   },
   statsInfo: {
     fontSize: "14px",

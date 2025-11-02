@@ -1,0 +1,56 @@
+JOHN DOE
+Software Developer
+
+Contact Information:
+Email: john.doe@email.com
+Phone: (555) 123-4567
+Location: New York, NY
+
+SUMMARY
+Experienced software developer with 5+ years of expertise in full-stack web development. 
+Proficient in JavaScript, React, Node.js, Python, and Django. Strong background in 
+database design, API development, and agile methodologies.
+
+TECHNICAL SKILLS
+• Programming Languages: JavaScript, Python, Java, TypeScript
+• Frontend: React, HTML, CSS, Redux, Vue.js
+• Backend: Node.js, Django, Express, Flask
+• Databases: MySQL, PostgreSQL, MongoDB
+• Tools: Git, Docker, AWS, Jenkins, Jest
+• Methodologies: Agile, Scrum, Test-Driven Development
+
+PROFESSIONAL EXPERIENCE
+
+Senior Software Developer | Tech Corp | 2021 - Present
+• Developed and maintained web applications using React and Django
+• Implemented RESTful APIs serving 10,000+ daily users
+• Collaborated with cross-functional teams in Agile environment
+• Optimized database queries reducing response time by 40%
+• Mentored junior developers and conducted code reviews
+
+Software Developer | StartupXYZ | 2019 - 2021
+• Built responsive frontend components using React and Redux
+• Developed backend services with Node.js and Express
+• Integrated third-party APIs and payment systems
+• Participated in sprint planning and daily standups
+• Wrote comprehensive unit tests achieving 90% code coverage
+
+EDUCATION
+Bachelor of Science in Computer Science | State University | 2019
+• Relevant Coursework: Data Structures, Algorithms, Database Systems, Software Engineering
+
+PROJECTS
+E-Commerce Platform
+• Full-stack web application built with React, Node.js, and PostgreSQL
+• Implemented user authentication, shopping cart, and payment processing
+• Deployed on AWS with CI/CD pipeline
+
+Task Management App
+• React-based application with real-time updates using WebSocket
+• Backend API developed with Django and Redis for caching
+• Mobile-responsive design with modern UI/UX
+
+CERTIFICATIONS
+• AWS Certified Developer Associate
+• Certified Scrum Master (CSM)
+• MongoDB Certified Developer
