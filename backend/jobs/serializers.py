@@ -15,7 +15,8 @@ class JobSerializer(serializers.ModelSerializer):
             'id', 'title', 'company', 'location', 'job_type', 'salary',
             'description', 'requirements', 'max_applicants', 'posted_by', 'posted_by_username',
             'created_at', 'updated_at', 'is_active', 'posted_at_display',
-            'application_count', 'is_accepting_applications', 'application_status_display'
+            'application_count', 'is_accepting_applications', 'application_status_display',
+            'required_skills', 'required_education', 'required_soft_skills', 'min_experience_years'
         ]
         read_only_fields = ['posted_by', 'created_at', 'updated_at']
     
@@ -30,7 +31,8 @@ class JobCreateSerializer(serializers.ModelSerializer):
         model = Job
         fields = [
             'title', 'company', 'location', 'job_type', 'salary',
-            'description', 'requirements', 'max_applicants'
+            'description', 'requirements', 'max_applicants',
+            'required_skills', 'required_education', 'required_soft_skills', 'min_experience_years'
         ]
     
     def create(self, validated_data):

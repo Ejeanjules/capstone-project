@@ -18,6 +18,28 @@ class Job(models.Model):
     description = models.TextField()
     requirements = models.TextField(blank=True, null=True)
     max_applicants = models.PositiveIntegerField(blank=True, null=True, help_text="Maximum number of applicants allowed")
+    
+    # Dynamic resume analysis fields
+    required_skills = models.JSONField(
+        default=list,
+        blank=True,
+        help_text="List of required technical/professional skills"
+    )
+    required_education = models.JSONField(
+        default=list,
+        blank=True,
+        help_text="List of required education qualifications"
+    )
+    required_soft_skills = models.JSONField(
+        default=list,
+        blank=True,
+        help_text="List of required soft skills"
+    )
+    min_experience_years = models.IntegerField(
+        default=0,
+        help_text="Minimum years of experience required"
+    )
+    
     posted_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='posted_jobs')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

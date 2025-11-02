@@ -17,7 +17,11 @@ export default function MainPage({ user, onLogout }) {
     salary: '',
     description: '',
     requirements: '',
-    maxApplicants: ''
+    maxApplicants: '',
+    requiredSkills: '',
+    requiredEducation: '',
+    requiredSoftSkills: '',
+    minExperienceYears: ''
   })
   const [applicationData, setApplicationData] = useState({
     coverLetter: '',
@@ -88,6 +92,10 @@ export default function MainPage({ user, onLogout }) {
           description: newJob.description,
           requirements: newJob.requirements,
           max_applicants: newJob.maxApplicants || null,
+          required_skills: newJob.requiredSkills ? newJob.requiredSkills.split(',').map(s => s.trim()).filter(s => s) : [],
+          required_education: newJob.requiredEducation ? newJob.requiredEducation.split(',').map(s => s.trim()).filter(s => s) : [],
+          required_soft_skills: newJob.requiredSoftSkills ? newJob.requiredSoftSkills.split(',').map(s => s.trim()).filter(s => s) : [],
+          min_experience_years: newJob.minExperienceYears ? parseInt(newJob.minExperienceYears) : 0,
         }),
       })
 
@@ -103,7 +111,11 @@ export default function MainPage({ user, onLogout }) {
           salary: '',
           description: '',
           requirements: '',
-          maxApplicants: ''
+          maxApplicants: '',
+          requiredSkills: '',
+          requiredEducation: '',
+          requiredSoftSkills: '',
+          minExperienceYears: ''
         })
         setShowPostForm(false)
         alert('Job posted successfully!')
@@ -259,7 +271,11 @@ export default function MainPage({ user, onLogout }) {
       salary: job.salary || '',
       description: job.description,
       requirements: job.requirements || '',
-      maxApplicants: job.max_applicants || ''
+      maxApplicants: job.max_applicants || '',
+      requiredSkills: job.required_skills ? job.required_skills.join(', ') : '',
+      requiredEducation: job.required_education ? job.required_education.join(', ') : '',
+      requiredSoftSkills: job.required_soft_skills ? job.required_soft_skills.join(', ') : '',
+      minExperienceYears: job.min_experience_years || ''
     })
     setShowPostForm(true)
   }
@@ -284,6 +300,10 @@ export default function MainPage({ user, onLogout }) {
           description: newJob.description,
           requirements: newJob.requirements,
           max_applicants: newJob.maxApplicants || null,
+          required_skills: newJob.requiredSkills ? newJob.requiredSkills.split(',').map(s => s.trim()).filter(s => s) : [],
+          required_education: newJob.requiredEducation ? newJob.requiredEducation.split(',').map(s => s.trim()).filter(s => s) : [],
+          required_soft_skills: newJob.requiredSoftSkills ? newJob.requiredSoftSkills.split(',').map(s => s.trim()).filter(s => s) : [],
+          min_experience_years: newJob.minExperienceYears ? parseInt(newJob.minExperienceYears) : 0,
         }),
       })
 
@@ -299,7 +319,11 @@ export default function MainPage({ user, onLogout }) {
           salary: '',
           description: '',
           requirements: '',
-          maxApplicants: ''
+          maxApplicants: '',
+          requiredSkills: '',
+          requiredEducation: '',
+          requiredSoftSkills: '',
+          minExperienceYears: ''
         })
         setShowPostForm(false)
         setEditingJob(null)
@@ -357,7 +381,11 @@ export default function MainPage({ user, onLogout }) {
       salary: '',
       description: '',
       requirements: '',
-      maxApplicants: ''
+      maxApplicants: '',
+      requiredSkills: '',
+      requiredEducation: '',
+      requiredSoftSkills: '',
+      minExperienceYears: ''
     })
   }
 
@@ -496,6 +524,65 @@ export default function MainPage({ user, onLogout }) {
                     placeholder="List required skills, experience, qualifications..."
                     rows="3"
                   />
+                </div>
+
+                {/* Resume Analysis Requirements */}
+                <div className="form-section">
+                  <h4 style={{marginTop: '1rem', marginBottom: '0.5rem', color: 'rgba(255,255,255,0.9)'}}>
+                    📊 Resume Analysis Criteria (Optional)
+                  </h4>
+                  <p style={{fontSize: '0.9rem', color: 'rgba(255,255,255,0.6)', marginBottom: '1rem'}}>
+                    Define specific requirements for automated resume screening. Leave blank to analyze based on job description.
+                  </p>
+                  
+                  <div className="form-group">
+                    <label>Required Skills</label>
+                    <input
+                      type="text"
+                      name="requiredSkills"
+                      value={newJob.requiredSkills}
+                      onChange={handleInputChange}
+                      placeholder="e.g., Python, React, Marketing, SEO, Excel (comma-separated)"
+                    />
+                    <small style={{color: 'rgba(255,255,255,0.5)', fontSize: '0.85rem'}}>
+                      Separate skills with commas
+                    </small>
+                  </div>
+
+                  <div className="form-row">
+                    <div className="form-group">
+                      <label>Required Education</label>
+                      <input
+                        type="text"
+                        name="requiredEducation"
+                        value={newJob.requiredEducation}
+                        onChange={handleInputChange}
+                        placeholder="e.g., Bachelor, Computer Science, MBA"
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Minimum Years of Experience</label>
+                      <input
+                        type="number"
+                        name="minExperienceYears"
+                        value={newJob.minExperienceYears}
+                        onChange={handleInputChange}
+                        placeholder="e.g., 3"
+                        min="0"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="form-group">
+                    <label>Required Soft Skills</label>
+                    <input
+                      type="text"
+                      name="requiredSoftSkills"
+                      value={newJob.requiredSoftSkills}
+                      onChange={handleInputChange}
+                      placeholder="e.g., Communication, Leadership, Teamwork"
+                    />
+                  </div>
                 </div>
 
                 <div className="form-actions">

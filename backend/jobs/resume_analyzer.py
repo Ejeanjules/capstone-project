@@ -142,17 +142,40 @@ class ResumeAnalyzer:
             'raw_text_length': len(resume_text)
         }
     
-    def parse_job_to_json(self, job_description: str, job_requirements: str = "") -> Dict:
+    def parse_job_to_json(self, job_description: str, job_requirements: str = "", job_model=None) -> Dict:
         """
-        Parse job posting into structured JSON format
+        Parse job posting into structured JSON format.
+        If job_model is provided with custom fields, use those directly.
+        Otherwise, extract from text (legacy behavior).
         
         Args:
             job_description (str): Job description text
             job_requirements (str): Job requirements text
+            job_model (Job): Optional Job model instance with required_* fields
             
         Returns:
             Dict: Structured job requirements
         """
+        # If job model provided with custom requirements, use them directly
+        if job_model and hasattr(job_model, 'required_skills'):
+            # Check if the job has custom requirements defined
+            has_custom_requirements = (
+                job_model.required_skills or 
+                job_model.required_education or 
+                job_model.required_soft_skills or
+                job_model.min_experience_years > 0
+            )
+            
+            if has_custom_requirements:
+                # Normalize to lowercase for matching
+                return {
+                    'required_technical_skills': [skill.lower() for skill in (job_model.required_skills or [])],
+                    'required_education': [edu.lower() for edu in (job_model.required_education or [])],
+                    'required_soft_skills': [skill.lower() for skill in (job_model.required_soft_skills or [])],
+                    'required_experience_years': job_model.min_experience_years or 0
+                }
+        
+        # Fallback to text extraction (for backwards compatibility or when fields not set)
         full_text = f"{job_description} {job_requirements}".lower()
         
         # Extract required technical skills
@@ -736,9 +759,11 @@ class ResumeAnalyzer:
             self.logger.info(f"Resume JSON: {json.dumps(resume_json, indent=2)}")
             
             # Parse job requirements into structured JSON
+            # Pass job_model to use custom requirements if available
             job_json = self.parse_job_to_json(
                 job_application.job.description,
-                job_application.job.requirements or ""
+                job_application.job.requirements or "",
+                job_model=job_application.job
             )
             self.logger.info(f"Job JSON: {json.dumps(job_json, indent=2)}")
             
@@ -962,9 +987,11 @@ class ResumeAnalyzer:
                 self.logger.info(f"Resume JSON: {json.dumps(resume_json, indent=2)}")
                 
                 # Parse job requirements into structured JSON
+                # Pass job_model to use custom requirements if available
                 job_json = self.parse_job_to_json(
                     job.description,
-                    job.requirements or ""
+                    job.requirements or "",
+                    job_model=job
                 )
                 self.logger.info(f"Job JSON: {json.dumps(job_json, indent=2)}")
                 
