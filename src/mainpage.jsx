@@ -16,7 +16,6 @@ export default function MainPage({ user, onLogout }) {
     type: 'full-time',
     salary: '',
     description: '',
-    requirements: '',
     maxApplicants: '',
     requiredSkills: '',
     requiredEducation: '',
@@ -90,7 +89,6 @@ export default function MainPage({ user, onLogout }) {
           job_type: newJob.type,
           salary: newJob.salary,
           description: newJob.description,
-          requirements: newJob.requirements,
           max_applicants: newJob.maxApplicants || null,
           required_skills: newJob.requiredSkills ? newJob.requiredSkills.split(',').map(s => s.trim()).filter(s => s) : [],
           required_education: newJob.requiredEducation ? newJob.requiredEducation.split(',').map(s => s.trim()).filter(s => s) : [],
@@ -110,7 +108,6 @@ export default function MainPage({ user, onLogout }) {
           type: 'full-time',
           salary: '',
           description: '',
-          requirements: '',
           maxApplicants: '',
           requiredSkills: '',
           requiredEducation: '',
@@ -270,7 +267,6 @@ export default function MainPage({ user, onLogout }) {
       type: job.job_type,
       salary: job.salary || '',
       description: job.description,
-      requirements: job.requirements || '',
       maxApplicants: job.max_applicants || '',
       requiredSkills: job.required_skills ? job.required_skills.join(', ') : '',
       requiredEducation: job.required_education ? job.required_education.join(', ') : '',
@@ -298,7 +294,6 @@ export default function MainPage({ user, onLogout }) {
           job_type: newJob.type,
           salary: newJob.salary,
           description: newJob.description,
-          requirements: newJob.requirements,
           max_applicants: newJob.maxApplicants || null,
           required_skills: newJob.requiredSkills ? newJob.requiredSkills.split(',').map(s => s.trim()).filter(s => s) : [],
           required_education: newJob.requiredEducation ? newJob.requiredEducation.split(',').map(s => s.trim()).filter(s => s) : [],
@@ -318,7 +313,6 @@ export default function MainPage({ user, onLogout }) {
           type: 'full-time',
           salary: '',
           description: '',
-          requirements: '',
           maxApplicants: '',
           requiredSkills: '',
           requiredEducation: '',
@@ -370,6 +364,40 @@ export default function MainPage({ user, onLogout }) {
     }
   }
 
+  const handleAnalyzeAllApplications = async (jobId, applicationCount) => {
+    if (applicationCount === 0) {
+      alert('No applications to analyze for this job.')
+      return
+    }
+
+    if (!confirm(`Analyze all ${applicationCount} application(s) for this job? This may take a moment.`)) {
+      return
+    }
+
+    try {
+      const auth = JSON.parse(localStorage.getItem('auth'))
+      const response = await fetch(`http://127.0.0.1:8000/api/jobs/${jobId}/analyze-resumes/`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Token ${auth.token}`,
+          'Content-Type': 'application/json',
+        },
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        alert(`Successfully analyzed ${data.length} resume(s)! Check your applications to see the results.`)
+        fetchJobs() // Refresh to update any counts
+      } else {
+        const errorData = await response.json()
+        alert(`Error: ${errorData.error || 'Failed to analyze applications'}`)
+      }
+    } catch (error) {
+      console.error('Error analyzing applications:', error)
+      alert('Error analyzing applications')
+    }
+  }
+
   const handleCancelEdit = () => {
     setEditingJob(null)
     setShowPostForm(false)
@@ -380,7 +408,6 @@ export default function MainPage({ user, onLogout }) {
       type: 'full-time',
       salary: '',
       description: '',
-      requirements: '',
       maxApplicants: '',
       requiredSkills: '',
       requiredEducation: '',
@@ -409,7 +436,26 @@ export default function MainPage({ user, onLogout }) {
             </button>
             <button 
               className="btn-post-job" 
-              onClick={() => setShowPostForm(!showPostForm)}
+              onClick={() => {
+                if (!showPostForm) {
+                  // Reset form when opening for new post
+                  setNewJob({
+                    title: '',
+                    company: '',
+                    location: '',
+                    type: 'full-time',
+                    salary: '',
+                    description: '',
+                    maxApplicants: '',
+                    requiredSkills: '',
+                    requiredEducation: '',
+                    requiredSoftSkills: '',
+                    minExperienceYears: ''
+                  })
+                  setEditingJob(null)
+                }
+                setShowPostForm(!showPostForm)
+              }}
             >
               {showPostForm ? 'Cancel' : '+ Post Job'}
             </button>
@@ -515,53 +561,44 @@ export default function MainPage({ user, onLogout }) {
                   />
                 </div>
 
-                <div className="form-group">
-                  <label>Requirements</label>
-                  <textarea
-                    name="requirements"
-                    value={newJob.requirements}
-                    onChange={handleInputChange}
-                    placeholder="List required skills, experience, qualifications..."
-                    rows="3"
-                  />
-                </div>
-
                 {/* Resume Analysis Requirements */}
                 <div className="form-section">
-                  <h4 style={{marginTop: '1rem', marginBottom: '0.5rem', color: 'rgba(255,255,255,0.9)'}}>
-                    📊 Resume Analysis Criteria (Optional)
+                  <h4>
+                    📊 Resume Analysis Criteria *
                   </h4>
-                  <p style={{fontSize: '0.9rem', color: 'rgba(255,255,255,0.6)', marginBottom: '1rem'}}>
-                    Define specific requirements for automated resume screening. Leave blank to analyze based on job description.
+                  <p>
+                    Define specific requirements for automated resume screening. This ensures accurate candidate matching.
                   </p>
                   
                   <div className="form-group">
-                    <label>Required Skills</label>
+                    <label>Required Skills *</label>
                     <input
                       type="text"
                       name="requiredSkills"
                       value={newJob.requiredSkills}
                       onChange={handleInputChange}
                       placeholder="e.g., Python, React, Marketing, SEO, Excel (comma-separated)"
+                      required
                     />
-                    <small style={{color: 'rgba(255,255,255,0.5)', fontSize: '0.85rem'}}>
+                    <small>
                       Separate skills with commas
                     </small>
                   </div>
 
                   <div className="form-row">
                     <div className="form-group">
-                      <label>Required Education</label>
+                      <label>Required Education *</label>
                       <input
                         type="text"
                         name="requiredEducation"
                         value={newJob.requiredEducation}
                         onChange={handleInputChange}
                         placeholder="e.g., Bachelor, Computer Science, MBA"
+                        required
                       />
                     </div>
                     <div className="form-group">
-                      <label>Minimum Years of Experience</label>
+                      <label>Minimum Years of Experience *</label>
                       <input
                         type="number"
                         name="minExperienceYears"
@@ -569,18 +606,20 @@ export default function MainPage({ user, onLogout }) {
                         onChange={handleInputChange}
                         placeholder="e.g., 3"
                         min="0"
+                        required
                       />
                     </div>
                   </div>
 
                   <div className="form-group">
-                    <label>Required Soft Skills</label>
+                    <label>Required Soft Skills *</label>
                     <input
                       type="text"
                       name="requiredSoftSkills"
                       value={newJob.requiredSoftSkills}
                       onChange={handleInputChange}
                       placeholder="e.g., Communication, Leadership, Teamwork"
+                      required
                     />
                   </div>
                 </div>

@@ -90,7 +90,11 @@
 
 .card h2 {
   margin-top: 0;
-  color: white;
+  color: #333;
+}
+
+.card h3 {
+  color: #333;
 }
 
 .card p {
@@ -527,8 +531,51 @@
 
 .form-group label {
   margin-bottom: 0.5rem;
-  font-weight: 600;
+  font-weight: 700;
+  color: #000000;
+  font-size: 0.95rem;
+}
+
+.form-group small {
+  color: #4a4a4a;
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
+  display: block;
+  font-weight: 500;
+}
+
+.file-help {
+  color: #4a4a4a;
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
+  display: block;
+  font-weight: 500;
+}
+
+.form-section {
+  background: #f9f9f9;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin: 1rem 0;
+  border: 1px solid #e6e6ef;
+}
+
+.form-section h4 {
   color: #333;
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.form-section p {
+  color: #666;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.form-section .form-group label {
+  color: #000000 !important;
+  font-weight: 700 !important;
 }
 
 .form-group input,
@@ -539,6 +586,8 @@
   border-radius: 4px;
   font-size: 1rem;
   transition: border-color 0.2s;
+  background: white;
+  color: #333;
 }
 
 .form-group input:focus,
@@ -546,6 +595,17 @@
 .form-group textarea:focus {
   outline: none;
   border-color: #4CAF50;
+  background: white;
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  color: #999;
+}
+
+.form-group select option {
+  background: white;
+  color: #333;
 }
 
 .form-actions {
@@ -708,6 +768,27 @@
   border-color: #999;
 }
 
+.btn-analyze-all {
+  background: #2196F3;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.2s;
+  margin-right: 0.5rem;
+}
+
+.btn-analyze-all:hover {
+  background: #1976D2;
+}
+
+.btn-analyze-all:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
 .btn-edit {
   background: #FF9800;
   color: white;
@@ -832,6 +913,7 @@
   background: white;
   border-radius: 8px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  padding: 2rem;
 }
 
 .application-form-card h3 {

@@ -22,7 +22,7 @@
 }
 
 .analysis-form {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.05) !important;
   border-radius: 12px;
   padding: 30px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
@@ -32,31 +32,34 @@
 
 .form-section {
   margin-bottom: 25px;
+  background: transparent !important;
 }
 
 .form-section label {
   display: block;
   font-weight: 600;
-  color: white;
+  color: white !important;
   margin-bottom: 8px;
   font-size: 0.95rem;
 }
 
-.job-select {
+.bulk-analysis-container .job-select,
+select.job-select {
   width: 100%;
   padding: 12px;
-  border: 2px solid rgba(255, 255, 255, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.2) !important;
   border-radius: 8px;
   font-size: 1rem;
   transition: all 0.2s;
-  background: rgba(255, 255, 255, 0.05);
-  color: white;
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  background-image: none !important;
+  color: white !important;
   cursor: pointer;
 }
 
-.job-select option {
-  background: #1a1a1a;
-  color: white;
+select.job-select option {
+  background: #1a1a1a !important;
+  color: white !important;
 }
 
 .job-select:hover {
@@ -98,20 +101,22 @@
   margin: 5px 0 0 0;
 }
 
-.file-input {
+.bulk-analysis-container .file-input,
+input[type="file"].file-input {
   width: 100%;
   padding: 12px;
-  border: 2px dashed rgba(255, 255, 255, 0.3);
+  border: 2px dashed rgba(255, 255, 255, 0.3) !important;
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s;
-  background: rgba(255, 255, 255, 0.03);
-  color: rgba(255, 255, 255, 0.7);
+  background-color: rgba(255, 255, 255, 0.03) !important;
+  color: rgba(255, 255, 255, 0.7) !important;
 }
 
-.file-input:hover {
-  border-color: #3b82f6;
-  background: rgba(59, 130, 246, 0.1);
+.bulk-analysis-container .file-input:hover,
+input[type="file"].file-input:hover {
+  border-color: #3b82f6 !important;
+  background: rgba(59, 130, 246, 0.1) !important;
 }
 
 .selected-files {

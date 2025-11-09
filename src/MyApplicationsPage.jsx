@@ -658,13 +658,18 @@ const MyApplicationsPage = ({ user, onLogout }) => {
                         </div>
                       )}
                       <div className="analysis-buttons">
-                        {resumeCount > analyzedCount && resumeCount > 0 && (
+                        {resumeCount > 0 && (
                           <button
-                            className={`analyze-all-btn ${isAnalyzing ? 'analyzing' : ''}`}
+                            className={`analyze-all-btn ${isAnalyzing ? 'analyzing' : ''} ${resumeCount === analyzedCount ? 'all-analyzed' : ''}`}
                             onClick={() => handleAnalyzeJobResumes(jobTitle)}
-                            disabled={isAnalyzing}
+                            disabled={isAnalyzing || resumeCount === analyzedCount}
                           >
-                            {isAnalyzing ? 'Analyzing...' : `Analyze All Resumes (${resumeCount - analyzedCount})`}
+                            {isAnalyzing 
+                              ? 'Analyzing...' 
+                              : resumeCount === analyzedCount 
+                                ? '✓ All Resumes Analyzed'
+                                : `Analyze All Resumes (${resumeCount - analyzedCount})`
+                            }
                           </button>
                         )}
                       </div>

@@ -133,6 +133,15 @@
   cursor: not-allowed;
 }
 
+.analyze-all-btn.all-analyzed {
+  background-color: #28a745;
+  cursor: default;
+}
+
+.analyze-all-btn.all-analyzed:hover {
+  background-color: #28a745;
+}
+
 .analyze-all-btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
