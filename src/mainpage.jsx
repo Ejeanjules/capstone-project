@@ -40,7 +40,7 @@ export default function MainPage({ user, onLogout }) {
   const fetchJobs = async () => {
     try {
       const auth = JSON.parse(localStorage.getItem('auth'))
-      const response = await fetch('http://127.0.0.1:8000/api/jobs/', {
+      const response = await fetch('/api/jobs/', {
         headers: {
           'Authorization': `Token ${auth.token}`,
           'Content-Type': 'application/json',
@@ -76,7 +76,7 @@ export default function MainPage({ user, onLogout }) {
     
     try {
       const auth = JSON.parse(localStorage.getItem('auth'))
-      const response = await fetch('http://127.0.0.1:8000/api/jobs/', {
+      const response = await fetch('/api/jobs/', {
         method: 'POST',
         headers: {
           'Authorization': `Token ${auth.token}`,
@@ -202,7 +202,7 @@ export default function MainPage({ user, onLogout }) {
         formData.append('resume', applicationData.resume)
       }
       
-      const response = await fetch(`http://127.0.0.1:8000/api/jobs/${applyingToJob.id}/apply/`, {
+      const response = await fetch(`/api/jobs/${applyingToJob.id}/apply/`, {
         method: 'POST',
         headers: {
           'Authorization': `Token ${auth.token}`,
@@ -281,7 +281,7 @@ export default function MainPage({ user, onLogout }) {
     
     try {
       const auth = JSON.parse(localStorage.getItem('auth'))
-      const response = await fetch(`http://127.0.0.1:8000/api/jobs/${editingJob.id}/`, {
+      const response = await fetch(`/api/jobs/${editingJob.id}/`, {
         method: 'PUT',
         headers: {
           'Authorization': `Token ${auth.token}`,
@@ -342,7 +342,7 @@ export default function MainPage({ user, onLogout }) {
     
     try {
       const auth = JSON.parse(localStorage.getItem('auth'))
-      const response = await fetch(`http://127.0.0.1:8000/api/jobs/${jobId}/`, {
+      const response = await fetch(`/api/jobs/${jobId}/`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Token ${auth.token}`,
@@ -376,7 +376,7 @@ export default function MainPage({ user, onLogout }) {
 
     try {
       const auth = JSON.parse(localStorage.getItem('auth'))
-      const response = await fetch(`http://127.0.0.1:8000/api/jobs/${jobId}/analyze-resumes/`, {
+      const response = await fetch(`/api/jobs/${jobId}/analyze-resumes/`, {
         method: 'POST',
         headers: {
           'Authorization': `Token ${auth.token}`,

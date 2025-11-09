@@ -19,7 +19,7 @@ const TopNavigation = ({ user, onLogout }) => {
       const token = JSON.parse(localStorage.getItem('auth'))?.token;
       if (!token) return;
       
-      const response = await fetch('http://127.0.0.1:8000/api/notifications/count/', {
+      const response = await fetch('/api/notifications/count/', {
         headers: { 'Authorization': `Token ${token}` }
       });
 

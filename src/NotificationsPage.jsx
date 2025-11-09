@@ -21,7 +21,7 @@ const NotificationsPage = ({ user, onLogout }) => {
   const fetchNotifications = async () => {
     try {
       const token = JSON.parse(localStorage.getItem('auth'))?.token;
-      const response = await fetch('http://127.0.0.1:8000/api/notifications/', {
+      const response = await fetch('/api/notifications/', {
         headers: { 'Authorization': `Token ${token}` }
       });
 
@@ -41,7 +41,7 @@ const NotificationsPage = ({ user, onLogout }) => {
   const fetchStats = async () => {
     try {
       const token = JSON.parse(localStorage.getItem('auth'))?.token;
-      const response = await fetch('http://127.0.0.1:8000/api/notifications/stats/', {
+      const response = await fetch('/api/notifications/stats/', {
         headers: { 'Authorization': `Token ${token}` }
       });
 
@@ -57,7 +57,7 @@ const NotificationsPage = ({ user, onLogout }) => {
   const markAsRead = async (notificationId) => {
     try {
       const token = JSON.parse(localStorage.getItem('auth'))?.token;
-      const response = await fetch(`http://127.0.0.1:8000/api/notifications/${notificationId}/read/`, {
+      const response = await fetch(`/api/notifications/${notificationId}/read/`, {
         method: 'PUT',
         headers: { 'Authorization': `Token ${token}` }
       });
@@ -80,7 +80,7 @@ const NotificationsPage = ({ user, onLogout }) => {
   const markAllAsRead = async () => {
     try {
       const token = JSON.parse(localStorage.getItem('auth'))?.token;
-      const response = await fetch('http://127.0.0.1:8000/api/notifications/mark-all-read/', {
+      const response = await fetch('/api/notifications/mark-all-read/', {
         method: 'PUT',
         headers: { 'Authorization': `Token ${token}` }
       });
@@ -99,7 +99,7 @@ const NotificationsPage = ({ user, onLogout }) => {
   const deleteNotification = async (notificationId) => {
     try {
       const token = JSON.parse(localStorage.getItem('auth'))?.token;
-      const response = await fetch(`http://127.0.0.1:8000/api/notifications/${notificationId}/delete/`, {
+      const response = await fetch(`/api/notifications/${notificationId}/delete/`, {
         method: 'DELETE',
         headers: { 'Authorization': `Token ${token}` }
       });
@@ -120,7 +120,7 @@ const NotificationsPage = ({ user, onLogout }) => {
 
     try {
       const token = JSON.parse(localStorage.getItem('auth'))?.token;
-      const response = await fetch('http://127.0.0.1:8000/api/notifications/clear-all/', {
+      const response = await fetch('/api/notifications/clear-all/', {
         method: 'DELETE',
         headers: { 'Authorization': `Token ${token}` }
       });

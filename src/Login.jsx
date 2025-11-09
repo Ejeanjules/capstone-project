@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { getApiUrl } from './config'
 
 export default function Login({ onLogin }) {
   const [username, setUsername] = useState('')
@@ -16,7 +17,7 @@ export default function Login({ onLogin }) {
       return
     }
 
-    fetch('http://127.0.0.1:8000/api/accounts/login/', {
+    fetch(getApiUrl('accounts/login/'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, password }),

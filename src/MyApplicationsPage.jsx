@@ -284,7 +284,7 @@ const MyApplicationsPage = ({ user, onLogout }) => {
   const fetchApplications = async () => {
     try {
       const token = JSON.parse(localStorage.getItem('auth'))?.token;
-      const response = await fetch('http://127.0.0.1:8000/api/jobs/applications/', {
+      const response = await fetch('/api/jobs/applications/', {
         headers: { 'Authorization': `Token ${token}` }
       });
 
@@ -304,7 +304,7 @@ const MyApplicationsPage = ({ user, onLogout }) => {
   const updateApplicationStatus = async (applicationId, status) => {
     try {
       const token = JSON.parse(localStorage.getItem('auth'))?.token;
-      const response = await fetch(`http://127.0.0.1:8000/api/jobs/applications/${applicationId}/status/`, {
+      const response = await fetch(`/api/jobs/applications/${applicationId}/status/`, {
         method: 'PUT',
         headers: {
           'Authorization': `Token ${token}`,
@@ -332,7 +332,7 @@ const MyApplicationsPage = ({ user, onLogout }) => {
   const downloadResume = async (applicationId, resumeName) => {
     try {
       const token = JSON.parse(localStorage.getItem('auth'))?.token;
-      const response = await fetch(`http://127.0.0.1:8000/api/jobs/applications/${applicationId}/resume/`, {
+      const response = await fetch(`/api/jobs/applications/${applicationId}/resume/`, {
         headers: { 'Authorization': `Token ${token}` }
       });
 
@@ -360,7 +360,7 @@ const MyApplicationsPage = ({ user, onLogout }) => {
     
     try {
       const auth = JSON.parse(localStorage.getItem('auth'));
-      const response = await fetch(`http://127.0.0.1:8000/api/jobs/applications/${application.id}/analyze-resume/`, {
+      const response = await fetch(`/api/jobs/applications/${application.id}/analyze-resume/`, {
         method: 'POST',
         headers: {
           'Authorization': `Token ${auth.token}`,
@@ -415,7 +415,7 @@ const MyApplicationsPage = ({ user, onLogout }) => {
 
     try {
       const auth = JSON.parse(localStorage.getItem('auth'));
-      const response = await fetch(`http://127.0.0.1:8000/api/jobs/${jobId}/analyze-resumes/`, {
+      const response = await fetch(`/api/jobs/${jobId}/analyze-resumes/`, {
         method: 'POST',
         headers: {
           'Authorization': `Token ${auth.token}`,
@@ -500,7 +500,7 @@ const MyApplicationsPage = ({ user, onLogout }) => {
           return;
         }
         
-        const response = await fetch(`http://127.0.0.1:8000/api/jobs/applications/${application.id}/upload-resume/`, {
+        const response = await fetch(`/api/jobs/applications/${application.id}/upload-resume/`, {
           method: 'POST',
           headers: {
             'Authorization': `Token ${auth.token}`,

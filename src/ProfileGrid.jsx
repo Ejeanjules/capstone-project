@@ -73,7 +73,7 @@ const ProfileGrid = ({ user, onLogout }) => {
   const fetchApplications = async () => {
     try {
       const auth = JSON.parse(localStorage.getItem('auth'));
-      const response = await fetch('http://127.0.0.1:8000/api/jobs/applications/', {
+      const response = await fetch('/api/jobs/applications/', {
         headers: {
           'Authorization': `Token ${auth.token}`,
           'Content-Type': 'application/json',
@@ -96,7 +96,7 @@ const ProfileGrid = ({ user, onLogout }) => {
   const fetchMyJobs = async () => {
     try {
       const auth = JSON.parse(localStorage.getItem('auth'));
-      const response = await fetch('http://127.0.0.1:8000/api/jobs/my-jobs/', {
+      const response = await fetch('/api/jobs/my-jobs/', {
         headers: {
           'Authorization': `Token ${auth.token}`,
           'Content-Type': 'application/json',
@@ -125,7 +125,7 @@ const ProfileGrid = ({ user, onLogout }) => {
   const updateApplicationStatus = async (applicationId, status) => {
     try {
       const auth = JSON.parse(localStorage.getItem('auth'));
-      const response = await fetch(`http://127.0.0.1:8000/api/jobs/applications/${applicationId}/status/`, {
+      const response = await fetch(`/api/jobs/applications/${applicationId}/status/`, {
         method: 'PUT',
         headers: {
           'Authorization': `Token ${auth.token}`,

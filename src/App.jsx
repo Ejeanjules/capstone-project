@@ -34,7 +34,7 @@ function App() {
       const raw = localStorage.getItem('auth')
       const a = raw ? JSON.parse(raw) : null
       if (a && a.token) {
-        fetch('http://127.0.0.1:8000/api/accounts/logout/', {
+        fetch('/api/accounts/logout/', {
           method: 'POST',
           headers: { 'Authorization': `Token ${a.token}` },
         }).catch(() => {})

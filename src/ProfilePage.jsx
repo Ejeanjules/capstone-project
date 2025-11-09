@@ -41,12 +41,12 @@ const ProfilePage = ({ user, onLogout }) => {
       const token = JSON.parse(localStorage.getItem('auth'))?.token;
       
       // Fetch user's applications
-      const applicationsResponse = await fetch('http://127.0.0.1:8000/api/jobs/my-applications/', {
+      const applicationsResponse = await fetch('/api/jobs/my-applications/', {
         headers: { 'Authorization': `Token ${token}` }
       });
       
       // Fetch user's posted jobs
-      const jobsResponse = await fetch('http://127.0.0.1:8000/api/jobs/my-jobs/', {
+      const jobsResponse = await fetch('/api/jobs/my-jobs/', {
         headers: { 'Authorization': `Token ${token}` }
       });
 

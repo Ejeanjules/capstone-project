@@ -29,7 +29,7 @@ const BulkResumeAnalysisPage = ({ user, onLogout }) => {
         return;
       }
 
-      const response = await fetch('http://127.0.0.1:8000/api/jobs/my-jobs/', {
+      const response = await fetch('/api/jobs/my-jobs/', {
         headers: {
           'Authorization': `Token ${auth.token}`,
         },
@@ -82,7 +82,7 @@ const BulkResumeAnalysisPage = ({ user, onLogout }) => {
     try {
       const auth = JSON.parse(localStorage.getItem('auth'));
       
-      const response = await fetch('http://127.0.0.1:8000/api/jobs/bulk-analyze/', {
+      const response = await fetch('/api/jobs/bulk-analyze/', {
         method: 'POST',
         headers: {
           'Authorization': `Token ${auth.token}`,
