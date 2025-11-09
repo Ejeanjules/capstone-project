@@ -1,14 +1,17 @@
 # backend/backend/settings.py
 
 from pathlib import Path
+from decouple import config, Csv
+import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'your-secret-key'  # Replace with your actual secret key
+# Load environment variables from .env file
+SECRET_KEY = config('SECRET_KEY', default='your-secret-key')
 
-DEBUG = True
+DEBUG = config('DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1', cast=Csv())
 
 # ✅ Installed apps
 INSTALLED_APPS = [
@@ -34,6 +37,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',  # Must be first
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # Add WhiteNoise for static files
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -47,7 +51,7 @@ ROOT_URLCONF = 'backend.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR.parent / 'dist'],  # Point to React build folder
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -62,13 +66,46 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'backend.wsgi.application'
 
-# Simple SQLite configuration for development (easy to run locally)
+# Database configuration
+# Use environment variables for production, SQLite for local development
+import os
+
+# Load DATABASE_URL from .env file using python-decouple
+DATABASE_URL = config('DATABASE_URL', default=None)
+
+if DATABASE_URL:
+    # Production: Use Supabase PostgreSQL
+    import dj_database_url
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=DATABASE_URL,
+            conn_max_age=600,
+            conn_health_checks=True,
+        )
+    }
+else:
+    # Development: Use SQLite for easy local testing
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
+
+# Alternative: Direct PostgreSQL configuration (if not using DATABASE_URL)
+# Uncomment and fill in your Supabase details:
+"""
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'postgres',
+        'USER': 'postgres',
+        'PASSWORD': 'your-supabase-password',
+        'HOST': 'db.xxxxxxxxxxxxx.supabase.co',
+        'PORT': '5432',
     }
 }
+"""
 
 # ✅ Password validation
 AUTH_PASSWORD_VALIDATORS = [
@@ -92,10 +129,17 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-# ✅ Static files
-STATIC_URL = 'static/'
+# ✅ Static files (CSS, JavaScript, Images)
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'  # Where collectstatic puts files
+STATICFILES_DIRS = [
+    BASE_DIR.parent / 'dist' / 'assets',  # React build assets
+]
 
-# ✅ Media files (for file uploads)
+# WhiteNoise configuration for serving static files
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+# ✅ Media files (for file uploads like resumes)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 

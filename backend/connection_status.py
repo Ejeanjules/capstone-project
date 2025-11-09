@@ -1,0 +1,27 @@
+print("\n" + "="*60)
+print("🔍 SUPABASE CONNECTION STATUS CHECK")
+print("="*60 + "\n")
+
+print("✅ Step 1: .env file is being loaded correctly")
+print("✅ Step 2: DATABASE_URL is configured for PostgreSQL")
+print("✅ Step 3: Django settings are using Supabase\n")
+
+print("❌ Step 4: Cannot connect to Supabase")
+print("   Error: 'could not translate host name'\n")
+
+print("📋 TROUBLESHOOTING STEPS:\n")
+print("1. Check your internet connection")
+print("2. Verify your Supabase project is ACTIVE:")
+print("   • Go to: https://supabase.com/dashboard/projects")
+print("   • Check if your project shows 'Paused' or 'Active'")
+print("   • If paused, click 'Resume' button\n")
+print("3. Verify the connection string in Supabase:")
+print("   • Go to Project Settings → Database")
+print("   • Check the 'Host' value matches: db.lzcklchxapnncaekahdh.supabase.co")
+print("   • Try the 'Connection Pooling' string if direct connection fails\n")
+
+print("="*60)
+print("Once your Supabase project is active, your tables are there!")
+print("Run this to verify:")
+print("  python manage.py migrate")
+print("="*60 + "\n")

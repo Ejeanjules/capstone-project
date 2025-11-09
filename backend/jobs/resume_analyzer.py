@@ -158,22 +158,33 @@ class ResumeAnalyzer:
         """
         # If job model provided with custom requirements, use them directly
         if job_model and hasattr(job_model, 'required_skills'):
-            # Check if the job has custom requirements defined
+            # Check if the job has ANY custom requirements defined (even if some fields are empty)
+            # A job has custom requirements if ANY field is set (not just default empty)
             has_custom_requirements = (
-                job_model.required_skills or 
-                job_model.required_education or 
-                job_model.required_soft_skills or
-                job_model.min_experience_years > 0
+                (hasattr(job_model, 'required_skills') and job_model.required_skills) or
+                (hasattr(job_model, 'required_education') and job_model.required_education) or
+                (hasattr(job_model, 'required_soft_skills') and job_model.required_soft_skills) or
+                (hasattr(job_model, 'min_experience_years') and job_model.min_experience_years > 0)
             )
+            
+            self.logger.info(f"Job model provided. Has custom requirements: {has_custom_requirements}")
+            self.logger.info(f"  - required_skills: {job_model.required_skills}")
+            self.logger.info(f"  - required_education: {job_model.required_education}")
+            self.logger.info(f"  - required_soft_skills: {job_model.required_soft_skills}")
+            self.logger.info(f"  - min_experience_years: {job_model.min_experience_years}")
             
             if has_custom_requirements:
                 # Normalize to lowercase for matching
-                return {
+                result = {
                     'required_technical_skills': [skill.lower() for skill in (job_model.required_skills or [])],
                     'required_education': [edu.lower() for edu in (job_model.required_education or [])],
                     'required_soft_skills': [skill.lower() for skill in (job_model.required_soft_skills or [])],
                     'required_experience_years': job_model.min_experience_years or 0
                 }
+                self.logger.info(f"Using custom requirements: {result}")
+                return result
+            else:
+                self.logger.info("No custom requirements found, falling back to text extraction")
         
         # Fallback to text extraction (for backwards compatibility or when fields not set)
         full_text = f"{job_description} {job_requirements}".lower()
@@ -800,13 +811,13 @@ class ResumeAnalyzer:
     
     def generate_structured_summary(self, match_results: Dict) -> str:
         """
-        Generate a concise human-readable summary from structured match results
+        Generate a friendly, conversational summary from structured match results
         
         Args:
             match_results: Dictionary containing structured match analysis
             
         Returns:
-            str: Concise human-readable summary with key insights
+            str: Human-friendly summary with natural language
         """
         score = match_results['overall_score']
         tech_score = match_results['category_scores']['technical_skills']
@@ -814,90 +825,105 @@ class ResumeAnalyzer:
         soft_score = match_results['category_scores']['soft_skills']
         exp_score = match_results['category_scores']['experience']
         
-        # Overall assessment
-        if score >= 90:
-            rating = "EXCEPTIONAL"
-            action = "HIGHLY RECOMMENDED"
-        elif score >= 80:
-            rating = "EXCELLENT"
-            action = "STRONGLY RECOMMENDED"
-        elif score >= 70:
-            rating = "GOOD"
-            action = "RECOMMENDED"
-        elif score >= 60:
-            rating = "FAIR"
-            action = "CONSIDER WITH CAUTION"
-        elif score >= 50:
-            rating = "MARGINAL"
-            action = "BORDERLINE"
-        else:
-            rating = "POOR"
-            action = "NOT RECOMMENDED"
-        
-        # Build concise summary
-        summary = f"MATCH SCORE: {score}% - {rating} ({action})\n\n"
-        
-        # Category breakdown (single line)
-        summary += f"Technical: {tech_score}% | Education: {edu_score}% | Soft Skills: {soft_score}% | Experience: {exp_score}%\n\n"
-        
-        # Key matched skills (top 8)
+        # Get matched and missing items
         matched_tech = match_results['matched']['technical_skills']
         matched_edu = match_results['matched']['education']
         matched_soft = match_results['matched']['soft_skills']
-        
-        all_matched = []
-        if matched_tech:
-            all_matched.extend(matched_tech[:6])
-        if matched_edu:
-            all_matched.extend(matched_edu[:2])
-        if matched_soft:
-            all_matched.extend(matched_soft[:2])
-        
-        if all_matched:
-            summary += f"[+] MATCHED: {', '.join(all_matched[:8])}"
-            if len(all_matched) > 8:
-                summary += f" (+{len(all_matched) - 8} more)"
-            summary += "\n"
-        
-        # Critical missing skills (top 6)
         missing_tech = match_results['missing']['technical_skills']
         missing_edu = match_results['missing']['education']
         missing_soft = match_results['missing']['soft_skills']
-        
-        all_missing = []
-        if missing_tech:
-            all_missing.extend(missing_tech[:4])
-        if missing_edu:
-            all_missing.extend(missing_edu[:1])
-        if missing_soft:
-            all_missing.extend(missing_soft[:1])
-        
-        if all_missing:
-            summary += f"[-] MISSING: {', '.join(all_missing[:6])}"
-            if len(all_missing) > 6:
-                summary += f" (+{len(all_missing) - 6} more)"
-            summary += "\n"
-        
-        # Experience note
         exp = match_results['experience']
+        
+        # Build conversational summary
+        summary = ""
+        
+        # Overall assessment with personality
+        if score >= 90:
+            summary += f"🌟 Excellent match at {score}%! This candidate looks outstanding for the role.\n\n"
+        elif score >= 80:
+            summary += f"✨ Strong match at {score}%. This candidate shows great potential.\n\n"
+        elif score >= 70:
+            summary += f"👍 Good match at {score}%. This is a solid candidate worth considering.\n\n"
+        elif score >= 60:
+            summary += f"🤔 Fair match at {score}%. This candidate has potential but with some gaps.\n\n"
+        elif score >= 50:
+            summary += f"⚠️ Borderline match at {score}%. This candidate would need significant development.\n\n"
+        else:
+            summary += f"❌ Low match at {score}%. This candidate may not be the right fit for this role.\n\n"
+        
+        # Strengths section
+        summary += "**What looks good:**\n"
+        strengths = []
+        
+        if tech_score >= 80:
+            summary += f"• Strong technical background ({tech_score}% match)"
+            if matched_tech:
+                summary += f" - has {', '.join(matched_tech[:3])}"
+                if len(matched_tech) > 3:
+                    summary += f" and {len(matched_tech) - 3} more skills"
+            summary += "\n"
+        elif tech_score >= 60:
+            summary += f"• Decent technical skills ({tech_score}% match)"
+            if matched_tech:
+                summary += f" including {', '.join(matched_tech[:2])}"
+            summary += "\n"
+        elif matched_tech:
+            summary += f"• Has some relevant skills: {', '.join(matched_tech[:3])}\n"
+        
+        if edu_score >= 80:
+            summary += f"• Meets education requirements ({edu_score}% match)"
+            if matched_edu:
+                summary += f" - {', '.join(matched_edu)}"
+            summary += "\n"
+        elif matched_edu:
+            summary += f"• Has {', '.join(matched_edu)}\n"
+        
+        if soft_score >= 80:
+            summary += f"• Great soft skills match ({soft_score}%)"
+            if matched_soft:
+                summary += f" - {', '.join(matched_soft)}"
+            summary += "\n"
+        elif matched_soft:
+            summary += f"• Shows {', '.join(matched_soft)}\n"
+        
         if exp['required_years'] > 0:
             if exp['meets_requirement']:
-                summary += f"\n[!] Experience: {exp['resume_years']}+ years (meets {exp['required_years']}+ requirement)\n"
-            else:
-                summary += f"\n[!] Experience: {exp['resume_years']} years (needs {exp['required_years']}+ years)\n"
+                summary += f"• Has {exp['resume_years']}+ years of experience (meets {exp['required_years']}+ year requirement)\n"
+            elif exp['resume_years'] > 0:
+                summary += f"• Has {exp['resume_years']} years of experience (below {exp['required_years']}+ year requirement)\n"
         
-        # Bottom line recommendation (concise)
-        summary += f"\nRECOMMENDATION: "
-        if score >= 80:
-            summary += "Schedule interview - well qualified for role"
-        elif score >= 70:
-            summary += "Solid candidate with minor gaps - assess learning ability"
-        elif score >= 60:
-            summary += "Has potential but notable gaps - probe depth carefully"
-        elif score >= 50:
-            summary += "Borderline fit - would need significant development"
+        # Areas for development
+        if missing_tech or missing_edu or missing_soft or (exp['required_years'] > 0 and not exp['meets_requirement']):
+            summary += "\n**Gaps to consider:**\n"
+            
+            if missing_tech and tech_score < 80:
+                summary += f"• Missing technical skills: {', '.join(missing_tech[:4])}"
+                if len(missing_tech) > 4:
+                    summary += f" and {len(missing_tech) - 4} more"
+                summary += "\n"
+            
+            if missing_edu and edu_score < 80:
+                summary += f"• Education: looking for {', '.join(missing_edu)}\n"
+            
+            if missing_soft and soft_score < 60:
+                summary += f"• Could improve: {', '.join(missing_soft[:3])}\n"
+            
+            if exp['required_years'] > 0 and not exp['meets_requirement']:
+                years_short = exp['required_years'] - exp['resume_years']
+                summary += f"• About {years_short} year{'s' if years_short != 1 else ''} short on experience\n"
+        
+        # Final recommendation
+        summary += "\n**Bottom line:**\n"
+        if score >= 85:
+            summary += "Definitely schedule an interview. This candidate has the skills and background you're looking for."
+        elif score >= 75:
+            summary += "Worth bringing in for an interview. Strong foundation with room to grow into the role."
+        elif score >= 65:
+            summary += "Consider for interview if willing to invest in training. Has potential but needs development."
+        elif score >= 55:
+            summary += "May struggle in this role without significant support. Better suited for a more junior position."
         else:
-            summary += "Does not meet minimum requirements"
+            summary += "Likely not the right fit for this particular role. Keep looking for better matches."
         
         return summary
     
