@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   plugins: [react()],
+  base: '/static/',  // Serve assets from /static/ to match Django's STATIC_URL
   server: {
     proxy: {
       '/api': {

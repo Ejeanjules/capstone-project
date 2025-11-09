@@ -133,7 +133,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'  # Where collectstatic puts files
 STATICFILES_DIRS = [
-    BASE_DIR.parent / 'dist' / 'assets',  # React build assets
+    BASE_DIR.parent / 'dist',  # React build folder (includes assets/)
 ]
 
 # WhiteNoise configuration for serving static files
