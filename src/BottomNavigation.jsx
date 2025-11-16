@@ -84,7 +84,7 @@ const TopNavigation = ({ user, onLogout }) => {
       <div className="top-nav-container">
         {/* Logo Section */}
         <div className="top-nav-logo">
-          <img src="/genieoffical.jpg" alt="Genie" className="genie-logo-img" />
+          <img src={import.meta.env.MODE === 'production' ? '/static/genieoffical.jpg' : '/genieoffical.jpg'} alt="Genie" className="genie-logo-img" />
         </div>
 
         {/* Navigation Items */}
