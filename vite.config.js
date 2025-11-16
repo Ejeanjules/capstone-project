@@ -1,9 +1,10 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-export default defineConfig({
+export default defineConfig(({ command }) => ({
   plugins: [react()],
-  base: '/static/',  // Serve assets from /static/ to match Django's STATIC_URL
+  // Only use /static/ base path in production builds, not in dev server
+  base: command === 'build' ? '/static/' : '/',
   server: {
     proxy: {
       '/api': {
@@ -13,4 +14,4 @@ export default defineConfig({
       },
     },
   },
-})
+}))

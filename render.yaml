@@ -16,3 +16,20 @@ services:
         value: False
       - key: ALLOWED_HOSTS
         sync: false  # Set to your Render domain
+
+  - type: cron
+    name: archive-expired-jobs
+    env: python
+    region: ohio
+    schedule: "*/15 * * * *"  # Every 15 minutes
+    buildCommand: "pip install -r backend/requirements.txt"
+    startCommand: "cd backend && python manage.py archive_expired_jobs"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.13.0
+      - key: DATABASE_URL
+        sync: false  # Must match web service database
+      - key: SECRET_KEY
+        sync: false  # Must match web service
+      - key: DEBUG
+        value: False

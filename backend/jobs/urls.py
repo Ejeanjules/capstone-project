@@ -18,4 +18,8 @@ urlpatterns = [
     path('applications/<int:application_id>/analysis/', views.get_resume_analysis, name='get_resume_analysis'),
     path('applications/<int:application_id>/upload-resume/', views.upload_resume_for_application, name='upload_resume_for_application'),
     path('bulk-analyze/', views.bulk_analyze_resumes, name='bulk_analyze_resumes'),
+    
+    # Archive endpoints
+    path('<int:job_id>/archive/', views.archive_job, name='archive_job'),
+    path('archived/', views.archived_jobs, name='archived_jobs'),
 ]

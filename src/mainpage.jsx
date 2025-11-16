@@ -5,6 +5,8 @@ import TopNavigation from './BottomNavigation'
 export default function MainPage({ user, onLogout }) {
   const navigate = useNavigate()
   const [jobs, setJobs] = useState([])
+  const [archivedJobs, setArchivedJobs] = useState([])
+  const [activeTab, setActiveTab] = useState('all')
   const [showPostForm, setShowPostForm] = useState(false)
   const [editingJob, setEditingJob] = useState(null)
   const [showApplicationForm, setShowApplicationForm] = useState(false)
@@ -20,7 +22,8 @@ export default function MainPage({ user, onLogout }) {
     requiredSkills: '',
     requiredEducation: '',
     requiredSoftSkills: '',
-    minExperienceYears: ''
+    minExperienceYears: '',
+    archiveAt: ''
   })
   const [applicationData, setApplicationData] = useState({
     coverLetter: '',
@@ -35,6 +38,7 @@ export default function MainPage({ user, onLogout }) {
   // Fetch jobs from backend
   useEffect(() => {
     fetchJobs()
+    fetchArchivedJobs()
   }, [])
 
   const fetchJobs = async () => {
@@ -55,6 +59,28 @@ export default function MainPage({ user, onLogout }) {
       }
     } catch (error) {
       console.error('Error fetching jobs:', error)
+    }
+  }
+
+  const fetchArchivedJobs = async () => {
+    try {
+      const auth = JSON.parse(localStorage.getItem('auth'))
+      const response = await fetch('/api/jobs/archived/', {
+        headers: {
+          'Authorization': `Token ${auth.token}`,
+          'Content-Type': 'application/json',
+        },
+      })
+      
+      if (response.ok) {
+        const data = await response.json()
+        // Only show archived jobs posted by current user
+        setArchivedJobs(data.filter(job => job.posted_by_username === user.username))
+      } else {
+        console.error('Failed to fetch archived jobs')
+      }
+    } catch (error) {
+      console.error('Error fetching archived jobs:', error)
     }
   }
 
@@ -94,6 +120,7 @@ export default function MainPage({ user, onLogout }) {
           required_education: newJob.requiredEducation ? newJob.requiredEducation.split(',').map(s => s.trim()).filter(s => s) : [],
           required_soft_skills: newJob.requiredSoftSkills ? newJob.requiredSoftSkills.split(',').map(s => s.trim()).filter(s => s) : [],
           min_experience_years: newJob.minExperienceYears ? parseInt(newJob.minExperienceYears) : 0,
+          archive_at: newJob.archiveAt || null,
         }),
       })
 
@@ -112,7 +139,8 @@ export default function MainPage({ user, onLogout }) {
           requiredSkills: '',
           requiredEducation: '',
           requiredSoftSkills: '',
-          minExperienceYears: ''
+          minExperienceYears: '',
+          archiveAt: ''
         })
         setShowPostForm(false)
         alert('Job posted successfully!')
@@ -271,7 +299,8 @@ export default function MainPage({ user, onLogout }) {
       requiredSkills: job.required_skills ? job.required_skills.join(', ') : '',
       requiredEducation: job.required_education ? job.required_education.join(', ') : '',
       requiredSoftSkills: job.required_soft_skills ? job.required_soft_skills.join(', ') : '',
-      minExperienceYears: job.min_experience_years || ''
+      minExperienceYears: job.min_experience_years || '',
+      archiveAt: job.archive_at ? job.archive_at.slice(0, 16) : ''
     })
     setShowPostForm(true)
   }
@@ -299,6 +328,7 @@ export default function MainPage({ user, onLogout }) {
           required_education: newJob.requiredEducation ? newJob.requiredEducation.split(',').map(s => s.trim()).filter(s => s) : [],
           required_soft_skills: newJob.requiredSoftSkills ? newJob.requiredSoftSkills.split(',').map(s => s.trim()).filter(s => s) : [],
           min_experience_years: newJob.minExperienceYears ? parseInt(newJob.minExperienceYears) : 0,
+          archive_at: newJob.archiveAt || null,
         }),
       })
 
@@ -317,7 +347,8 @@ export default function MainPage({ user, onLogout }) {
           requiredSkills: '',
           requiredEducation: '',
           requiredSoftSkills: '',
-          minExperienceYears: ''
+          minExperienceYears: '',
+          archiveAt: ''
         })
         setShowPostForm(false)
         setEditingJob(null)
@@ -332,6 +363,33 @@ export default function MainPage({ user, onLogout }) {
     } catch (error) {
       console.error('Error updating job:', error)
       alert('Error updating job')
+    }
+  }
+
+  const handleArchiveJob = async (jobId) => {
+    try {
+      const auth = JSON.parse(localStorage.getItem('auth'))
+      const response = await fetch(`/api/jobs/${jobId}/archive/`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Token ${auth.token}`,
+          'Content-Type': 'application/json',
+        },
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        fetchJobs() // Refresh the jobs list
+        fetchArchivedJobs() // Refresh archived jobs list
+        alert(data.message)
+      } else {
+        const errorData = await response.json()
+        console.error('Failed to archive job:', errorData)
+        alert('Failed to archive job')
+      }
+    } catch (error) {
+      console.error('Error archiving job:', error)
+      alert('Error archiving job')
     }
   }
 
@@ -412,7 +470,8 @@ export default function MainPage({ user, onLogout }) {
       requiredSkills: '',
       requiredEducation: '',
       requiredSoftSkills: '',
-      minExperienceYears: ''
+      minExperienceYears: '',
+      archiveAt: ''
     })
   }
 
@@ -450,7 +509,8 @@ export default function MainPage({ user, onLogout }) {
                     requiredSkills: '',
                     requiredEducation: '',
                     requiredSoftSkills: '',
-                    minExperienceYears: ''
+                    minExperienceYears: '',
+                    archiveAt: ''
                   })
                   setEditingJob(null)
                 }
@@ -622,6 +682,20 @@ export default function MainPage({ user, onLogout }) {
                       required
                     />
                   </div>
+
+                  <div className="form-group">
+                    <label>Auto-Archive Date & Time (Optional)</label>
+                    <input
+                      type="datetime-local"
+                      name="archiveAt"
+                      value={newJob.archiveAt}
+                      onChange={handleInputChange}
+                      placeholder="Select date and time to archive"
+                    />
+                    <small style={{color: '#666', fontSize: '0.875rem'}}>
+                      Job will be automatically archived at this date and time
+                    </small>
+                  </div>
                 </div>
 
                 <div className="form-actions">
@@ -757,16 +831,113 @@ export default function MainPage({ user, onLogout }) {
                 </div>
               </form>
             </div>
-          </div>
-        )}
+        </div>
+      )}
+
+        {/* Job Type Tabs */}
+        <div className="job-tabs">
+          <button 
+            className={`tab ${activeTab === 'all' ? 'active' : ''}`}
+            onClick={() => setActiveTab('all')}
+          >
+            All Jobs
+          </button>
+          <button 
+            className={`tab ${activeTab === 'full-time' ? 'active' : ''}`}
+            onClick={() => setActiveTab('full-time')}
+          >
+            Full-Time
+          </button>
+          <button 
+            className={`tab ${activeTab === 'part-time' ? 'active' : ''}`}
+            onClick={() => setActiveTab('part-time')}
+          >
+            Part-Time
+          </button>
+          <button 
+            className={`tab ${activeTab === 'contract' ? 'active' : ''}`}
+            onClick={() => setActiveTab('contract')}
+          >
+            Contract
+          </button>
+          <button 
+            className={`tab ${activeTab === 'internship' ? 'active' : ''}`}
+            onClick={() => setActiveTab('internship')}
+          >
+            Internship
+          </button>
+          {/* Only show Archived tab if user has archived jobs */}
+          {archivedJobs.length > 0 && (
+            <button 
+              className={`tab ${activeTab === 'archived' ? 'active' : ''}`}
+              onClick={() => setActiveTab('archived')}
+            >
+              📦 Archived ({archivedJobs.length})
+            </button>
+          )}
+        </div>
 
         <div className="jobs-list">
-          {jobs.length === 0 ? (
-            <div className="no-jobs">
-              <p>No job postings yet. Be the first to post a job!</p>
-            </div>
+          {activeTab === 'archived' ? (
+            // Show archived jobs
+            archivedJobs.length === 0 ? (
+              <div className="no-jobs">
+                <p>No archived jobs.</p>
+              </div>
+            ) : (
+              archivedJobs.map(job => (
+                <div key={job.id} className="job-card archived-job">
+                  <div className="job-header">
+                    <div className="job-title-section">
+                      <h3 className="job-title">{job.title} <span className="archived-badge">ARCHIVED</span></h3>
+                      <p className="job-company">{job.company}</p>
+                    </div>
+                    <div className="job-meta">
+                      <span className={`job-type ${job.job_type}`}>{job.job_type}</span>
+                      <span className="job-posted">Posted {job.posted_at_display}</span>
+                    </div>
+                  </div>
+                  
+                  <div className="job-details">
+                    <div className="job-info">
+                      <span className="job-location">📍 {job.location}</span>
+                      {job.salary && <span className="job-salary">💰 {job.salary}</span>}
+                      <span className="job-applications">
+                        👥 {job.application_status_display}
+                      </span>
+                    </div>
+                    
+                    <p className="job-description">{job.description}</p>
+                    
+                    <div className="job-footer">
+                      <span className="posted-by">Posted by: {job.posted_by_username}</span>
+                      <div className="job-actions">
+                        <button 
+                          className="btn-unarchive"
+                          onClick={() => handleArchiveJob(job.id)}
+                        >
+                          📤 Unarchive
+                        </button>
+                        <button 
+                          className="btn-delete"
+                          onClick={() => handleDeleteJob(job.id)}
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))
+            )
           ) : (
-            jobs.map(job => (
+            // Show active jobs
+            jobs.filter(job => activeTab === 'all' || job.job_type === activeTab).length === 0 ? (
+              <div className="no-jobs">
+                <p>{activeTab === 'all' ? 'No job postings yet. Be the first to post a job!' : `No ${activeTab} jobs available.`}</p>
+              </div>
+            ) : (
+              jobs.filter(job => activeTab === 'all' || job.job_type === activeTab).map(job => (
               <div key={job.id} className="job-card">
                 <div className="job-header">
                   <div className="job-title-section">
@@ -803,13 +974,19 @@ export default function MainPage({ user, onLogout }) {
                     <span className="posted-by">Posted by: {job.posted_by_username}</span>
                     <div className="job-actions">
                       {job.posted_by_username === user.username ? (
-                        // Show Edit/Delete buttons for own jobs
+                        // Show Edit/Archive/Delete buttons for own jobs
                         <>
                           <button 
                             className="btn-edit"
                             onClick={() => handleEditJob(job)}
                           >
                             Edit
+                          </button>
+                          <button 
+                            className="btn-archive"
+                            onClick={() => handleArchiveJob(job.id)}
+                          >
+                            📦 Archive
                           </button>
                           <button 
                             className="btn-delete"
@@ -837,6 +1014,7 @@ export default function MainPage({ user, onLogout }) {
                 </div>
               </div>
             ))
+            )
           )}
         </div>
       </main>

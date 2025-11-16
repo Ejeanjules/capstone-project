@@ -16,8 +16,8 @@ from user_notifications.models import create_new_application_notification, creat
 @permission_classes([IsAuthenticated])
 def jobs_list_create(request):
     if request.method == 'GET':
-        # Get all active jobs
-        jobs = Job.objects.filter(is_active=True)
+        # Get all active and non-archived jobs
+        jobs = Job.objects.filter(is_active=True, is_archived=False)
         serializer = JobSerializer(jobs, many=True)
         return Response(serializer.data)
     
@@ -70,7 +70,7 @@ def job_detail(request, job_id):
 @permission_classes([IsAuthenticated])
 def my_jobs(request):
     """Get jobs posted by the current user"""
-    jobs = Job.objects.filter(posted_by=request.user, is_active=True)
+    jobs = Job.objects.filter(posted_by=request.user, is_active=True, is_archived=False)
     serializer = JobSerializer(jobs, many=True)
     return Response(serializer.data)
 
@@ -473,3 +473,32 @@ def bulk_analyze_resumes(request):
             'company': job.company
         }
     })
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def archive_job(request, job_id):
+    """Archive or unarchive a job posting"""
+    try:
+        job = Job.objects.get(id=job_id, posted_by=request.user, is_active=True)
+    except Job.DoesNotExist:
+        return Response({'error': 'Job not found or not owned by you'}, status=status.HTTP_404_NOT_FOUND)
+    
+    # Toggle archive status
+    job.is_archived = not job.is_archived
+    job.save()
+    
+    serializer = JobSerializer(job)
+    return Response({
+        'message': f'Job {"archived" if job.is_archived else "unarchived"} successfully',
+        'job': serializer.data
+    })
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def archived_jobs(request):
+    """Get archived jobs posted by the current user"""
+    jobs = Job.objects.filter(posted_by=request.user, is_active=True, is_archived=True)
+    serializer = JobSerializer(jobs, many=True)
+    return Response(serializer.data)

@@ -614,6 +614,42 @@
   margin-top: 1rem;
 }
 
+/* Job Type Tabs */
+.job-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+  border-bottom: 2px solid #e6e6ef;
+  overflow-x: auto;
+  padding-bottom: 0;
+}
+
+.job-tabs .tab {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  background: transparent;
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  position: relative;
+  bottom: -2px;
+}
+
+.job-tabs .tab:hover {
+  color: #6366f1;
+  background: rgba(99, 102, 241, 0.05);
+}
+
+.job-tabs .tab.active {
+  color: #6366f1;
+  border-bottom-color: #6366f1;
+  font-weight: 600;
+}
+
 .jobs-list {
   display: flex;
   flex-direction: column;
@@ -802,6 +838,52 @@
 
 .btn-edit:hover {
   background: #F57C00;
+}
+
+.btn-archive {
+  background: #9e9e9e;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.btn-archive:hover {
+  background: #757575;
+}
+
+.btn-unarchive {
+  background: #4caf50;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.btn-unarchive:hover {
+  background: #388e3c;
+}
+
+.archived-job {
+  opacity: 0.8;
+  border-left: 4px solid #9e9e9e;
+}
+
+.archived-badge {
+  display: inline-block;
+  background: #9e9e9e;
+  color: white;
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  margin-left: 0.5rem;
+  font-weight: 600;
 }
 
 .btn-delete {

@@ -44,6 +44,8 @@ class Job(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=True)
+    is_archived = models.BooleanField(default=False, help_text="Whether the job is archived")
+    archive_at = models.DateTimeField(null=True, blank=True, help_text="Scheduled date and time to automatically archive this job")
     
     class Meta:
         ordering = ['-created_at']
