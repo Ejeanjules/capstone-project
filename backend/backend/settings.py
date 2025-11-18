@@ -189,6 +189,7 @@ REST_FRAMEWORK = {
 # Use console backend for development, SMTP for production
 if DEBUG:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+    DEFAULT_FROM_EMAIL = 'noreply@yourapp.com'
 else:
     # Production email settings
     EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -198,6 +199,3 @@ else:
     EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
     EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
     DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default=EMAIL_HOST_USER)
-
-# For development
-DEFAULT_FROM_EMAIL = 'noreply@yourapp.com'
