@@ -50,8 +50,14 @@ def current_user(request):
 def password_reset_request(request):
     serializer = PasswordResetRequestSerializer(data=request.data)
     if serializer.is_valid():
-        result = serializer.save()
-        return Response(result, status=status.HTTP_200_OK)
+        try:
+            result = serializer.save()
+            return Response(result, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({
+                'message': 'Failed to send reset email. Please try again later.',
+                'error': str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 

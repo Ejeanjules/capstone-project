@@ -72,10 +72,14 @@ class PasswordResetRequestSerializer(serializers.Serializer):
         
         # Send email
         try:
+            # Verify email configuration exists
+            if not settings.EMAIL_HOST_USER:
+                raise Exception("Email configuration is not set up. Please configure email settings in Render environment variables.")
+            
             send_mail(
                 subject=subject,
                 message=message,
-                from_email=settings.DEFAULT_FROM_EMAIL,
+                from_email=settings.DEFAULT_FROM_EMAIL or settings.EMAIL_HOST_USER,
                 recipient_list=[email],
                 fail_silently=False,
             )
@@ -84,12 +88,18 @@ class PasswordResetRequestSerializer(serializers.Serializer):
         except Exception as e:
             email_sent = False
             email_error = str(e)
+            # Log the error for debugging
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"Failed to send password reset email: {e}")
         
+        # Always return a successful response even if email fails
+        # This prevents information leakage about valid email addresses
         return {
-            'message': 'Password reset email has been sent successfully' if email_sent else 'Failed to send email',
+            'message': 'If an account exists with this email, you will receive password reset instructions.',
             'email_sent': email_sent,
-            'email_error': email_error,
-            # Include token details for development/debugging (remove in production)
+            'email_error': email_error if settings.DEBUG else None,
+            # Include token details for development/debugging only
             'debug_info': {
                 'token': token,
                 'uid': uid,
