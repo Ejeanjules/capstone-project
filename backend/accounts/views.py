@@ -48,17 +48,27 @@ def current_user(request):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def password_reset_request(request):
-    serializer = PasswordResetRequestSerializer(data=request.data)
-    if serializer.is_valid():
-        try:
-            result = serializer.save()
-            return Response(result, status=status.HTTP_200_OK)
-        except Exception as e:
-            return Response({
-                'message': 'Failed to send reset email. Please try again later.',
-                'error': str(e)
-            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    try:
+        serializer = PasswordResetRequestSerializer(data=request.data)
+        if serializer.is_valid():
+            try:
+                result = serializer.save()
+                return Response(result, status=status.HTTP_200_OK)
+            except Exception as e:
+                import logging
+                logging.error(f"Password reset email error: {e}")
+                return Response({
+                    'message': 'Failed to send reset email. Please try again later.',
+                    'error': str(e)
+                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        import logging
+        logging.error(f"Password reset request error: {e}")
+        return Response({
+            'message': 'An error occurred processing your request.',
+            'error': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @api_view(['POST'])
