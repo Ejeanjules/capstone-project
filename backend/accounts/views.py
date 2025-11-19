@@ -92,3 +92,47 @@ def password_reset_confirm(request):
             'username': user.username
         }, status=status.HTTP_200_OK)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def test_email(request):
+    """Temporary endpoint to test email configuration"""
+    from django.core.mail import send_mail
+    from django.conf import settings
+    import traceback
+    
+    try:
+        recipient = request.GET.get('email', 'e.jeanjules@outlook.com')
+        send_mail(
+            subject='Test Email from Genie Job Board',
+            message='This is a test email. If you receive this, email configuration is working correctly!',
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[recipient],
+            fail_silently=False,
+        )
+        return Response({
+            'message': 'Email sent successfully!',
+            'config': {
+                'host': settings.EMAIL_HOST,
+                'port': settings.EMAIL_PORT,
+                'use_tls': settings.EMAIL_USE_TLS,
+                'use_ssl': getattr(settings, 'EMAIL_USE_SSL', False),
+                'from_email': settings.DEFAULT_FROM_EMAIL,
+                'to_email': recipient,
+                'user': settings.EMAIL_HOST_USER[:20] + '...' if len(settings.EMAIL_HOST_USER) > 20 else settings.EMAIL_HOST_USER
+            }
+        })
+    except Exception as e:
+        return Response({
+            'error': str(e),
+            'traceback': traceback.format_exc(),
+            'config': {
+                'host': settings.EMAIL_HOST,
+                'port': settings.EMAIL_PORT,
+                'use_tls': settings.EMAIL_USE_TLS,
+                'use_ssl': getattr(settings, 'EMAIL_USE_SSL', False),
+                'from_email': settings.DEFAULT_FROM_EMAIL,
+                'user': settings.EMAIL_HOST_USER[:20] + '...' if len(settings.EMAIL_HOST_USER) > 20 else settings.EMAIL_HOST_USER
+            }
+        }, status=500)
