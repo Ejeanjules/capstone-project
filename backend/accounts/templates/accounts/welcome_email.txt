@@ -1,0 +1,18 @@
+Subject: Welcome to Genie Job Board!
+
+Hello {{ user.username }},
+
+Welcome to Genie Job Board! Your account has been successfully created.
+
+You can now:
+- Browse and apply for job postings
+- Post your own job listings
+- Track your applications
+- Receive notifications about your jobs and applications
+
+Get started by logging in at: https://genie-job-board.onrender.com
+
+If you didn't create this account, please contact us immediately.
+
+Best regards,
+The Genie Job Board Team

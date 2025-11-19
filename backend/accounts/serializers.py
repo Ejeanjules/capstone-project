@@ -17,11 +17,36 @@ class RegisterSerializer(serializers.ModelSerializer):
         fields = ('id', 'username', 'email', 'password')
         extra_kwargs = {'password': {'write_only': True}}
 
+    def validate_email(self, value):
+        if User.objects.filter(email=value).exists():
+            raise serializers.ValidationError('A user with this email already exists.')
+        return value
+
     def create(self, validated_data):
         password = validated_data.pop('password')
         user = User(**validated_data)
         user.set_password(password)
         user.save()
+        
+        # Send welcome email
+        try:
+            context = {'user': user}
+            email_content = render_to_string('accounts/welcome_email.txt', context)
+            lines = email_content.strip().split('\n')
+            subject = lines[0].replace('Subject: ', '') if lines[0].startswith('Subject: ') else 'Welcome to Genie Job Board!'
+            message = '\n'.join(lines[2:])
+            
+            send_mail(
+                subject=subject,
+                message=message,
+                from_email=settings.DEFAULT_FROM_EMAIL if not settings.DEBUG else settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[user.email],
+                fail_silently=True,  # Don't fail registration if email fails
+            )
+        except Exception as e:
+            import logging
+            logging.warning(f"Failed to send welcome email to {user.email}: {e}")
+        
         return user
 
 
@@ -41,15 +66,19 @@ class PasswordResetRequestSerializer(serializers.Serializer):
     email = serializers.EmailField()
 
     def validate_email(self, value):
-        try:
-            user = User.objects.get(email=value)
-        except User.DoesNotExist:
+        users = User.objects.filter(email=value)
+        if not users.exists():
             raise serializers.ValidationError('No user found with this email address.')
+        if users.count() > 1:
+            # Multiple users with same email - use the most recently created one
+            import logging
+            logging.warning(f"Multiple users found with email {value}. Using most recent.")
         return value
 
     def save(self):
         email = self.validated_data['email']
-        user = User.objects.get(email=email)
+        # Get the most recently created user if multiple exist with same email
+        user = User.objects.filter(email=email).order_by('-date_joined').first()
         
         # Generate reset token
         token = default_token_generator.make_token(user)
