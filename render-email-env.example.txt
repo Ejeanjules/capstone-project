@@ -1,0 +1,64 @@
+# Email Configuration Template for Render
+# Copy these to your Render Environment Variables (NOT to a file in your repo)
+
+# ============================================
+# OPTION 1: Gmail with SSL (Port 465) - TRY THIS FIRST
+# ============================================
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=465
+EMAIL_USE_TLS=False
+EMAIL_USE_SSL=True
+EMAIL_HOST_USER=your-email@gmail.com
+EMAIL_HOST_PASSWORD=your-16-character-app-password
+DEFAULT_FROM_EMAIL=your-email@gmail.com
+
+# ============================================
+# OPTION 2: Gmail with TLS (Port 587)
+# ============================================
+# EMAIL_HOST=smtp.gmail.com
+# EMAIL_PORT=587
+# EMAIL_USE_TLS=True
+# EMAIL_USE_SSL=False
+# EMAIL_HOST_USER=your-email@gmail.com
+# EMAIL_HOST_PASSWORD=your-16-character-app-password
+# DEFAULT_FROM_EMAIL=your-email@gmail.com
+
+# ============================================
+# OPTION 3: SendGrid (RECOMMENDED FOR PRODUCTION)
+# ============================================
+# Sign up at https://sendgrid.com/ and get API key
+# EMAIL_HOST=smtp.sendgrid.net
+# EMAIL_PORT=587
+# EMAIL_USE_TLS=True
+# EMAIL_USE_SSL=False
+# EMAIL_HOST_USER=apikey
+# EMAIL_HOST_PASSWORD=your-sendgrid-api-key
+# DEFAULT_FROM_EMAIL=your-verified-sender@gmail.com
+
+# ============================================
+# OPTION 4: Mailgun
+# ============================================
+# Sign up at https://mailgun.com/ and get credentials
+# EMAIL_HOST=smtp.mailgun.org
+# EMAIL_PORT=587
+# EMAIL_USE_TLS=True
+# EMAIL_USE_SSL=False
+# EMAIL_HOST_USER=your-mailgun-username
+# EMAIL_HOST_PASSWORD=your-mailgun-password
+# DEFAULT_FROM_EMAIL=your-email@gmail.com
+
+# ============================================
+# HOW TO USE THIS FILE
+# ============================================
+# 1. Go to Render Dashboard → Your Service → Environment
+# 2. Add each variable above as a separate environment variable
+# 3. Use your actual values (not the placeholders shown here)
+# 4. Save changes - Render will automatically redeploy
+# 5. See EMAIL_TROUBLESHOOTING.md for detailed instructions
+
+# ============================================
+# SECURITY WARNING
+# ============================================
+# NEVER commit actual passwords or API keys to GitHub!
+# This template file is safe to commit (no real credentials)
+# Always use Render's Environment Variables for actual secrets
