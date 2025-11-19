@@ -56,7 +56,12 @@ def password_reset_request(request):
                 return Response(result, status=status.HTTP_200_OK)
             except Exception as e:
                 import logging
-                logging.error(f"Password reset email error: {e}")
+                import traceback
+                error_msg = f"Password reset email error: {e}"
+                logging.error(error_msg)
+                logging.error(traceback.format_exc())
+                print(f"ERROR: {error_msg}")  # Print to stdout for Render logs
+                print(traceback.format_exc())
                 return Response({
                     'message': 'Failed to send reset email. Please try again later.',
                     'error': str(e)
@@ -64,7 +69,12 @@ def password_reset_request(request):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
         import logging
-        logging.error(f"Password reset request error: {e}")
+        import traceback
+        error_msg = f"Password reset request error: {e}"
+        logging.error(error_msg)
+        logging.error(traceback.format_exc())
+        print(f"ERROR: {error_msg}")  # Print to stdout for Render logs
+        print(traceback.format_exc())
         return Response({
             'message': 'An error occurred processing your request.',
             'error': str(e)
