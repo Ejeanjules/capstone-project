@@ -798,6 +798,9 @@ export default function MainPage({ user, onLogout }) {
                     <small className="file-help">
                       Upload PDF or Word document (max 5MB)
                     </small>
+                    <small className="file-help" style={{ display: 'block', marginTop: '5px', color: '#ff9800' }}>
+                      ⚠️ <strong>Important:</strong> PDFs must be text-based (not scanned images or photos). If you have a photo/scan of your resume, please convert it to a text-based PDF first.
+                    </small>
                     {applicationData.resume && (
                       <div className="file-selected">
                         ✓ {applicationData.resume.name} ({(applicationData.resume.size / 1024).toFixed(1)}KB)
