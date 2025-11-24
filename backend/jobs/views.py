@@ -249,6 +249,12 @@ def analyze_resume(request, application_id):
         
         if analysis_result['error']:
             error_msg = analysis_result['error']
+            # Provide more helpful error message for unreadable PDFs
+            if 'Could not extract text from resume' in error_msg:
+                return Response({
+                    'error': 'Unable to read resume file. The PDF may be image-based, corrupted, or password-protected. Please upload a text-based PDF resume.',
+                    'details': error_msg
+                }, status=status.HTTP_400_BAD_REQUEST)
             return Response({'error': error_msg}, status=status.HTTP_400_BAD_REQUEST)
         
         # Ensure the summary is properly encoded
