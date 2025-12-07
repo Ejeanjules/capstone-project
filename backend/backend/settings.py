@@ -8,9 +8,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Load environment variables from .env file
 SECRET_KEY = config('SECRET_KEY', default='your-secret-key')
-X_FRAME_OPTIONS = ""
+X_FRAME_OPTIONS = "ALLOW-ALL"
 DEBUG = config('DEBUG', default=True, cast=bool)
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1', cast=Csv())
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,*.disent.com', cast=Csv())
 # ✅ Installed apps
 INSTALLED_APPS = [
     'django.contrib.admin',
