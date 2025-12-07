@@ -24,7 +24,7 @@ const ApplicationCard = ({ application, onStatusUpdate, onDownloadResume, onAnal
             <strong>Category Scores:</strong>
             <div className="category-scores">
               <div className="score-item">
-                <span className="score-label">Technical Skills:</span>
+                <span className="score-label">Hard Skills:</span>
                 <span className="score-value" style={{ color: data.category_scores.technical_skills >= 70 ? '#2ea44f' : data.category_scores.technical_skills >= 50 ? '#fb8500' : '#d73a49' }}>
                   {data.category_scores.technical_skills}%
                 </span>
@@ -52,7 +52,7 @@ const ApplicationCard = ({ application, onStatusUpdate, onDownloadResume, onAnal
 
           {data.matched.technical_skills?.length > 0 && (
             <div className="analysis-section">
-              <strong>✅ Matched Technical Skills ({data.matched.technical_skills.length}):</strong>
+              <strong>✅ Matched Hard Skills ({data.matched.technical_skills.length}):</strong>
               <div className="keyword-list">
                 {data.matched.technical_skills.map((keyword, index) => (
                   <span key={`matched-tech-${index}`} className="matched-keyword">{keyword}</span>
@@ -63,7 +63,7 @@ const ApplicationCard = ({ application, onStatusUpdate, onDownloadResume, onAnal
           
           {data.missing.technical_skills?.length > 0 && (
             <div className="analysis-section">
-              <strong>❌ Missing Technical Skills ({data.missing.technical_skills.length}):</strong>
+              <strong>❌ Missing Hard Skills ({data.missing.technical_skills.length}):</strong>
               <div className="keyword-list">
                 {data.missing.technical_skills.map((keyword, index) => (
                   <span key={`missing-tech-${index}`} className="missing-keyword">{keyword}</span>

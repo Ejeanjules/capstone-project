@@ -199,7 +199,7 @@ const BulkResumeAnalysisPage = ({ user, onLogout }) => {
           <h4>Category Breakdown</h4>
           <div className="category-score-grid">
             <div className="category-score-item">
-              <span className="category-label">Technical Skills</span>
+              <span className="category-label">Hard Skills</span>
               <div className="score-bar-container">
                 <div 
                   className="score-bar" 
@@ -243,7 +243,7 @@ const BulkResumeAnalysisPage = ({ user, onLogout }) => {
 
         <div className="keywords-section">
           <div className="keyword-category">
-            <h4>Technical Skills</h4>
+            <h4>Hard Skills</h4>
             {matched.technical_skills && matched.technical_skills.length > 0 && (
               <div className="keyword-list">
                 <span className="keyword-label">Matched:</span>
