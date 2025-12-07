@@ -8,11 +8,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Load environment variables from .env file
 SECRET_KEY = config('SECRET_KEY', default='your-secret-key')
-
+X_FRAME_OPTIONS = ""
 DEBUG = config('DEBUG', default=True, cast=bool)
-
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1', cast=Csv())
-
 # ✅ Installed apps
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -74,7 +72,7 @@ import os
 # Load DATABASE_URL from .env file using python-decouple
 DATABASE_URL = config('DATABASE_URL', default=None)
 
-if DATABASE_URL:
+if DATABASE_URL and  False:
     # Production: Use Supabase PostgreSQL
     import dj_database_url
     DATABASES = {
