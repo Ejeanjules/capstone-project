@@ -25,8 +25,8 @@ const ApplicationCard = ({ application, onStatusUpdate, onDownloadResume, onAnal
             <div className="category-scores">
               <div className="score-item">
                 <span className="score-label">Hard Skills:</span>
-                <span className="score-value" style={{ color: data.category_scores.Hard_skills >= 70 ? '#2ea44f' : data.category_scores.technical_skills >= 50 ? '#fb8500' : '#d73a49' }}>
-                  {data.category_scores.Hard_skills}%
+                <span className="score-value" style={{ color: data.category_scores.technical_skills >= 70 ? '#2ea44f' : data.category_scores.technical_skills >= 50 ? '#fb8500' : '#d73a49' }}>
+                  {data.category_scores.technical_skills}%
                 </span>
               </div>
               <div className="score-item">
