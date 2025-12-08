@@ -967,9 +967,53 @@ export default function MainPage({ user, onLogout }) {
                   
                   <p className="job-description">{job.description}</p>
                   
-                  {job.requirements && (
-                    <div className="job-requirements">
-                      <strong>Requirements:</strong> {job.requirements}
+                  {/* Display detailed requirements */}
+                  {(job.required_skills?.length > 0 || job.required_education?.length > 0 || 
+                    job.required_soft_skills?.length > 0 || job.min_experience_years > 0) && (
+                    <div className="job-requirements-section">
+                      <h4>Requirements:</h4>
+                      
+                      {job.min_experience_years > 0 && (
+                        <div className="requirement-item">
+                          <strong>💼 Experience:</strong>
+                          <div className="requirement-tags">
+                            <span className="requirement-tag">{job.min_experience_years}+ years</span>
+                          </div>
+                        </div>
+                      )}
+                      
+                      {job.required_skills?.length > 0 && (
+                        <div className="requirement-item">
+                          <strong>🔧 Hard Skills:</strong>
+                          <div className="requirement-tags">
+                            {job.required_skills.map((skill, idx) => (
+                              <span key={idx} className="requirement-tag">{skill}</span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      
+                      {job.required_education?.length > 0 && (
+                        <div className="requirement-item">
+                          <strong>🎓 Education:</strong>
+                          <div className="requirement-tags">
+                            {job.required_education.map((edu, idx) => (
+                              <span key={idx} className="requirement-tag">{edu}</span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      
+                      {job.required_soft_skills?.length > 0 && (
+                        <div className="requirement-item">
+                          <strong>💡 Soft Skills:</strong>
+                          <div className="requirement-tags">
+                            {job.required_soft_skills.map((skill, idx) => (
+                              <span key={idx} className="requirement-tag">{skill}</span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )}
                   

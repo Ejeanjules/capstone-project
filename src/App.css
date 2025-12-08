@@ -756,6 +756,52 @@
   color: #555;
 }
 
+.job-requirements-section {
+  background: #f8f9fa;
+  padding: 1rem;
+  border-radius: 6px;
+  margin: 1rem 0;
+  border-left: 3px solid #007bff;
+}
+
+.job-requirements-section h4 {
+  margin: 0 0 0.75rem 0;
+  color: #333;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.requirement-item {
+  margin-bottom: 0.75rem;
+}
+
+.requirement-item:last-child {
+  margin-bottom: 0;
+}
+
+.requirement-item strong {
+  display: block;
+  color: #555;
+  font-size: 0.875rem;
+  margin-bottom: 0.4rem;
+}
+
+.requirement-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.4rem;
+}
+
+.requirement-tag {
+  background: #007bff;
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
 .job-footer {
   display: flex;
   justify-content: space-between;

@@ -8,7 +8,7 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "start:backend": "cd backend && \"..\\.venv\\Scripts\\python.exe\" manage.py runserver",
+    "start:backend": "cd backend && python manage.py runserver",
     "start:servers": "concurrently \"npm run start:backend\" \"npm run dev\" --names \"Backend,Frontend\" --prefix-colors \"blue,green\""
   },
   "dependencies": {
